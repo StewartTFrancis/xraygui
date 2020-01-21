@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using xraylib;
@@ -14,7 +15,7 @@ namespace xraygui
 {
     public partial class Form1 : Form
     {
-		AcqController acq = new AcqController();
+		AcqController acquire = new AcqController();
 		MotionController motion = new MotionController();
 
 		public Form1()
@@ -22,67 +23,22 @@ namespace xraygui
             InitializeComponent();
 
 			cbBinning.SelectedIndex = 0;
+			cbMoveType.SelectedIndex = 0;
         }
-
-        private void doSomething()
-        {
-			{
-				Trace.WriteLine("Motion open: " + motion.OpenDevice());
-				//Trace.WriteLine("Motion Home: " + motion.Home());
-				motion.CloseDevice();
-
-				Trace.WriteLine("Acquire open: " + acq.OpenDevice());
-
-				this.lblStatus.Text = "Current Status: " + acq.state;
-				// Trace.WriteLine("Acquire image: " + acq.AcquireImage()); 
-
-				acq.CloseDevice();
-				this.lblStatus.Text = "Current Status: " + acq.state;
-
-			}
-
-				/* 
-				 * int framesToAcquire = 5;
-					printf("\nXIS X-ray Imaging Software - Demo starting\n");
-
-					UINT returnValue = Initialize_Detector();
-					if (returnValue != HIS_ALL_OK) {
-						std::cout << "Issue with Initialization" << std::endl;
-					}
-
-
-					unsigned short *acquisitionBuffer = (unsigned short *)malloc(2 * rows * columns * sizeof(unsigned short)); //define destination buffer
-
-					returnValue = Acquisition_DefineDestBuffers(detectorDescriptor, acquisitionBuffer, framesToAcquire, rows, columns);
-					std::cout << "Destination Buffers Defined" << std::endl;
-
-					//Set_Offset_Image(2, 1);
-					//Sleep(3000);
-					Acquire_Image(framesToAcquire);
-					char filename[] = "output.tif";
-					Sleep(3000); //haphazard way to fix timing issues. Will be removed in later versions
-					Save_Image(acquisitionBuffer, filename);
-					//0 is the number of frames to skip before frames are actually recorded (support x-ray start up transients possibly)
-					//HIS_SEQ_AVERAGE is how to handle frames, can be HIS_SEQ_CONTINUOUS or other
-
-					printf("rows: %d\ncolumns: %d\n", rows, columns);
-					Acquisition_CloseAll(); */
-        }
-
-		private void acquireToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			doSomething();
-		}
 
 		private void cbBinning_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (acq.state != AcqController.State.OPEN)
+			if (acquire.state != AcqController.State.OPEN)
 				return;
 
-			ComboBox ourCB = (ComboBox)sender;
+			Acq.DETECTOR_BINNING binMode = mapIndexToBin(((ComboBox)sender).SelectedIndex);
 
-			Acq.DETECTOR_BINNING binMode = Acq.DETECTOR_BINNING.BINNING_1x1;
+			if (acquire.SetBinningMode(binMode) != Acq.HIS_RETURN.HIS_ALL_OK)
+				MessageBox.Show("Error setting binning mode. Check the log");
+		}
 
+		private Acq.DETECTOR_BINNING mapIndexToBin(int index)
+		{
 			/*
 				No binning
 				2x2 binning
@@ -91,34 +47,145 @@ namespace xraygui
 				1x4 binning
 			*/
 
-			switch(ourCB.SelectedIndex)
+			switch (index)
 			{
 				case 0:
-					binMode = Acq.DETECTOR_BINNING.BINNING_1x1;
-					break;
+					return Acq.DETECTOR_BINNING.BINNING_1x1;
 				case 1:
-					binMode = Acq.DETECTOR_BINNING.BINNING_2x2;
-					break;
+					return Acq.DETECTOR_BINNING.BINNING_2x2;
 				case 2:
-					binMode = Acq.DETECTOR_BINNING.BINNING_4x4;
-					break;
+					return Acq.DETECTOR_BINNING.BINNING_4x4;
 				case 3:
-					binMode = Acq.DETECTOR_BINNING.BINNING_1x2;
-					break;
+					return Acq.DETECTOR_BINNING.BINNING_1x2;
 				case 4:
-					binMode = Acq.DETECTOR_BINNING.BINNING_1x4;
-					break;
+					return Acq.DETECTOR_BINNING.BINNING_1x4;
 				default:
-					// What?
-					break;
+					// What? If we're here, someone's changed something
+					throw new InvalidOperationException("We got an invalid index in mapIndexToBin");
 			}
+		}
+
+		private MovementType mapIndexToMovement(int index)
+		{
+			if (index == 0)
+				return MovementType.Relative;
+			else if (index == 1)
+				return MovementType.Absolute;
+
+			throw new InvalidOperationException("We got an invalid index in mapIndexToMovement");
 
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			acq.Dispose();
+			acquire.Dispose();
 			motion.Dispose();
+		}
+
+		private void btnHome_Click(object sender, EventArgs e)
+		{
+			if (!motion.Home())
+				MessageBox.Show("Homing failed, check the log");
+		}
+
+		private void btnMove_Click(object sender, EventArgs e)
+		{
+			motion.Move((double)numMoveTo.Value, mapIndexToMovement(cbMoveType.SelectedIndex));
+		}
+
+		private void closeDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			motion.CloseDevice();
+			acquire.CloseDevice();
+
+			UpdateButtons();
+
+			this.lblStatus.Text = "Current Status: " + acquire.state;
+		}
+
+		private void openDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var opened = motion.OpenDevice();
+			acquire.OpenDevice();
+
+			lblCurrAngle.Text = "Current Angle: " + motion.CurrentAngle;
+			tblblCurrAngle.Text = lblCurrAngle.Text;
+
+			this.lblStatus.Text = "Current Status: " + acquire.state;
+
+			UpdateButtons();
+		}
+
+		private void tmrCurrAngle_Tick(object sender, EventArgs e)
+		{
+			lblCurrAngle.Text = "Current Angle: " + motion.CurrentAngle;
+			tblblCurrAngle.Text = lblCurrAngle.Text;
+		}
+
+		private void btnAcq_Click(object sender, EventArgs e)
+		{
+			if (acquire.state != AcqController.State.OPEN)
+			{
+				MessageBox.Show("Device isn't open");
+				return;
+			}
+
+			acquire.SetImageCount((int)numAcqCount.Value);
+
+			acquire.AcquireImage();
+		}
+
+		private void btnCTAcq_Click(object sender, EventArgs e)
+		{
+			if (acquire.state != AcqController.State.OPEN)
+			{
+				MessageBox.Show("Device isn't open");
+				return;
+			}
+
+			acquire.SetImageCount((int)numCtCount.Value);
+
+			double startAngle = (double)numStartAngle.Value;
+			double endAngle = (double)numEndAngle.Value;
+
+			double step = startAngle < endAngle ? (double)numAngleIncr.Value : (double)-numAngleIncr.Value;
+
+			Trace.WriteLine("Start: " + startAngle + "; End: " + endAngle + "; Step: " + step);
+
+			for(double x = startAngle; step > 0 ? x <= endAngle : x >= endAngle ; x += step)
+			{
+				motion.Move(x, MovementType.Absolute);
+
+				Thread.Sleep((int)(numSettle.Value * 1000));
+
+				acquire.AcquireImage();
+			}
+		}
+
+		private void cbMoveType_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if(mapIndexToMovement(((ComboBox)sender).SelectedIndex) == MovementType.Absolute)
+			{
+				numMoveTo.Value = numMoveTo.Value < 0 ? numMoveTo.Value + 360 : numMoveTo.Value;
+
+				numMoveTo.Minimum = 0;
+				numMoveTo.Maximum = 360;
+			} else
+			{
+				numMoveTo.Minimum = -360;
+				numMoveTo.Maximum = 360;
+			}
+		}
+
+		private void UpdateButtons()
+		{
+			btnAcq.Enabled = acquire.state == AcqController.State.OPEN;
+			btnCTAcq.Enabled = acquire.state == AcqController.State.OPEN;
+			btnHome.Enabled = acquire.state == AcqController.State.OPEN;
+			btnMove.Enabled = acquire.state == AcqController.State.OPEN;
+
+			openDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.CLOSED;
+			closeDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.OPEN;
 		}
 	}
 }

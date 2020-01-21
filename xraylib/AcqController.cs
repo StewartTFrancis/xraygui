@@ -28,6 +28,8 @@ namespace xraylib
         double[] intTime = new double[12];
         int nIntTimes = 12;
 
+        bool bufferGood = false;
+
         public enum State
         {
             CLOSED,
@@ -38,7 +40,16 @@ namespace xraylib
         public AcqController()
         {}
 
+        public bool SetImageCount(int imgCount)
+        {
+            if (state != State.OPEN)
+                return false;
 
+            if (imgCount != dwFrames)
+                dwFrames = (uint)imgCount;
+
+            return SetBuffer() == HIS_RETURN.HIS_ALL_OK;
+        }
 
         public bool OpenDevice()
         {
@@ -48,6 +59,11 @@ namespace xraylib
             try
             {
                 deviceHandle = IntPtr.Zero;
+
+                dwColumns = 1;
+                dwRows = 1;
+                dwFrames = 1;
+
                 var resp = Acquisition_Init(ref deviceHandle, HIS_BOARD_TYPE.ELTEC_XRD_FGE_Opto, 0, true, 0, 0, 0, true, true);
                 
                 Trace.WriteLine("Open Device response: " + resp.ToString());
@@ -57,9 +73,14 @@ namespace xraylib
                     return false;
                 }
 
+
                 // Docs say we can just ask the device for this info.
                 Acquisition_GetConfiguration(ref deviceHandle, ref dwFrames, ref dwRows, ref dwColumns, ref dwDataType, ref dwSortFlags, ref irqEnabled, ref acqType, ref systemId, ref syncMode, ref hwAccess);
                Trace.WriteLine("GetConfiguration Device response: " + resp.ToString());
+
+                dwColumns = 1;
+                dwRows = 1;
+                dwFrames = 1;
 
                 // Get valid integration times
                 Acquisition_GetIntTimes(ref deviceHandle, ref intTime, ref nIntTimes);
@@ -94,10 +115,45 @@ namespace xraylib
             return resp;
         }
 
+        private bool CheckBuffer()
+        {
+            var buffSize = dwFrames * dwRows * dwColumns * 2;
+            if (!bufferGood || imageBuffer.Length != dwFrames * dwRows * dwColumns * 2)
+                return false;
+
+            return true;
+        }
+
+        private HIS_RETURN SetBuffer()
+        {
+            if(state != State.OPEN)
+                throw new InvalidOperationException("Can't set buffer before opening");
+
+            if (!CheckBuffer())
+            {
+                var buffSize = dwFrames * dwRows * dwColumns * 2;
+                imageBuffer = new ushort[buffSize];
+                bufferGood = true;
+            }
+
+            var resp = Acquisition_DefineDestBuffers(ref deviceHandle, ref imageBuffer, dwFrames, dwRows, dwColumns);
+
+            return resp;
+        }
+
         public HIS_RETURN AcquireImage()
         {
+            if (state != State.OPEN)
+                throw new InvalidOperationException("Can't acquire before opening");
+
             ushort[] nullshort = null;
             uint[] nulluint = null;
+
+            if (!CheckBuffer())
+            {
+                Trace.WriteLine("Buffer not good and we're in AcquireImage, calling SetBuffer");
+                Trace.WriteLine("SetBuffer Device response: " + SetBuffer());
+            }
 
             var resp = Acquisition_Acquire_Image(ref deviceHandle, 1, 0, HIS_SEQ.AVERAGE, ref nullshort, ref nulluint, ref nulluint);
             Trace.WriteLine("Acquisition_Acquire_Image Device response: " + resp.ToString());

@@ -21,5 +21,6 @@ namespace xraylib
             System.Diagnostics.Trace.WriteLine(
                 "\nStackTrace ---\n{0}", ex.StackTrace);
         }
+
     }
 }

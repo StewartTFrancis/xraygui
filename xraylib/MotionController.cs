@@ -17,12 +17,16 @@ namespace xraylib
     {
         Connection conn;
         Device dev;
+
+        double currPos = 0;
         public MotionController()
         {
         }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
+
+        public double CurrentAngle { get { return currPos; } }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -57,6 +61,8 @@ namespace xraylib
             {
                 conn = Connection.OpenSerialPort("COM1");
                 dev = conn.DetectDevices()[0];
+
+                currPos = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
             }
             catch (Exception ex)
             {
@@ -112,6 +118,8 @@ namespace xraylib
                 return false;
             }
 
+            currPos = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
+
             return true;
         }
 
@@ -122,6 +130,7 @@ namespace xraylib
             try
             {
                 dev.Home();
+                currPos = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
             }
             catch (Exception ex)
             {

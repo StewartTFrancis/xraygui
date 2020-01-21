@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.acquireToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.components = new System.ComponentModel.Container();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tblblCurrAngle = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
@@ -51,35 +51,61 @@
             this.cbGain = new System.Windows.Forms.ComboBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.btnAcq = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
+            this.numAcqCount = new System.Windows.Forms.NumericUpDown();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.numCtCount = new System.Windows.Forms.NumericUpDown();
+            this.numAngleIncr = new System.Windows.Forms.NumericUpDown();
+            this.numEndAngle = new System.Windows.Forms.NumericUpDown();
+            this.numStartAngle = new System.Windows.Forms.NumericUpDown();
+            this.numSettle = new System.Windows.Forms.NumericUpDown();
+            this.btnCTAcq = new System.Windows.Forms.Button();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.panel6 = new System.Windows.Forms.Panel();
+            this.btnHome = new System.Windows.Forms.Button();
+            this.lblCurrAngle = new System.Windows.Forms.Label();
+            this.btnMove = new System.Windows.Forms.Button();
+            this.label18 = new System.Windows.Forms.Label();
+            this.numMoveTo = new System.Windows.Forms.NumericUpDown();
+            this.cbMoveType = new System.Windows.Forms.ComboBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.panel7 = new System.Windows.Forms.Panel();
-            this.menuStrip1.SuspendLayout();
+            this.trackBar2 = new System.Windows.Forms.TrackBar();
+            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.openDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tmrCurrAngle = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numAcqCount)).BeginInit();
+            this.panel5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numCtCount)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAngleIncr)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numEndAngle)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numStartAngle)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSettle)).BeginInit();
+            this.panel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMoveTo)).BeginInit();
+            this.panel7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.acquireToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1139, 24);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // acquireToolStripMenuItem
-            // 
-            this.acquireToolStripMenuItem.Name = "acquireToolStripMenuItem";
-            this.acquireToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
-            this.acquireToolStripMenuItem.Text = "Acquire";
-            this.acquireToolStripMenuItem.Click += new System.EventHandler(this.acquireToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lblStatus});
+            this.lblStatus,
+            this.tblblCurrAngle});
             this.statusStrip1.Location = new System.Drawing.Point(0, 500);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1139, 22);
@@ -92,10 +118,16 @@
             this.lblStatus.Size = new System.Drawing.Size(88, 17);
             this.lblStatus.Text = "Status: CLOSED";
             // 
+            // tblblCurrAngle
+            // 
+            this.tblblCurrAngle.Name = "tblblCurrAngle";
+            this.tblblCurrAngle.Size = new System.Drawing.Size(84, 17);
+            this.tblblCurrAngle.Text = "Current Angle:";
+            // 
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Location = new System.Drawing.Point(0, 28);
+            this.panel1.Location = new System.Drawing.Point(0, 27);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(205, 46);
             this.panel1.TabIndex = 3;
@@ -118,7 +150,7 @@
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.cbGain);
-            this.panel2.Location = new System.Drawing.Point(0, 73);
+            this.panel2.Location = new System.Drawing.Point(0, 72);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(205, 288);
             this.panel2.TabIndex = 4;
@@ -263,46 +295,420 @@
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Location = new System.Drawing.Point(0, 360);
+            this.panel3.Location = new System.Drawing.Point(0, 359);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(205, 137);
+            this.panel3.Size = new System.Drawing.Size(205, 138);
             this.panel3.TabIndex = 5;
             // 
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.btnAcq);
+            this.panel4.Controls.Add(this.label9);
+            this.panel4.Controls.Add(this.numAcqCount);
             this.panel4.Location = new System.Drawing.Point(204, 27);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(238, 103);
             this.panel4.TabIndex = 5;
             // 
+            // btnAcq
+            // 
+            this.btnAcq.Enabled = false;
+            this.btnAcq.Location = new System.Drawing.Point(155, 70);
+            this.btnAcq.Name = "btnAcq";
+            this.btnAcq.Size = new System.Drawing.Size(75, 23);
+            this.btnAcq.TabIndex = 16;
+            this.btnAcq.Text = "Acquire";
+            this.btnAcq.UseVisualStyleBackColor = true;
+            this.btnAcq.Click += new System.EventHandler(this.btnAcq_Click);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 21);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(95, 13);
+            this.label9.TabIndex = 15;
+            this.label9.Text = "Number to Acquire";
+            // 
+            // numAcqCount
+            // 
+            this.numAcqCount.Location = new System.Drawing.Point(107, 19);
+            this.numAcqCount.Name = "numAcqCount";
+            this.numAcqCount.Size = new System.Drawing.Size(47, 20);
+            this.numAcqCount.TabIndex = 0;
+            this.numAcqCount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.numCtCount);
+            this.panel5.Controls.Add(this.numAngleIncr);
+            this.panel5.Controls.Add(this.numEndAngle);
+            this.panel5.Controls.Add(this.numStartAngle);
+            this.panel5.Controls.Add(this.numSettle);
+            this.panel5.Controls.Add(this.btnCTAcq);
+            this.panel5.Controls.Add(this.label16);
+            this.panel5.Controls.Add(this.label15);
+            this.panel5.Controls.Add(this.label14);
+            this.panel5.Controls.Add(this.label13);
+            this.panel5.Controls.Add(this.label12);
             this.panel5.Location = new System.Drawing.Point(441, 27);
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(388, 103);
             this.panel5.TabIndex = 6;
+            // 
+            // numCtCount
+            // 
+            this.numCtCount.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.numCtCount.Location = new System.Drawing.Point(105, 78);
+            this.numCtCount.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numCtCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.numCtCount.Name = "numCtCount";
+            this.numCtCount.Size = new System.Drawing.Size(62, 20);
+            this.numCtCount.TabIndex = 25;
+            this.numCtCount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // numAngleIncr
+            // 
+            this.numAngleIncr.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.numAngleIncr.Location = new System.Drawing.Point(105, 54);
+            this.numAngleIncr.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numAngleIncr.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.numAngleIncr.Name = "numAngleIncr";
+            this.numAngleIncr.Size = new System.Drawing.Size(62, 20);
+            this.numAngleIncr.TabIndex = 24;
+            this.numAngleIncr.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // numEndAngle
+            // 
+            this.numEndAngle.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numEndAngle.Location = new System.Drawing.Point(238, 29);
+            this.numEndAngle.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numEndAngle.Name = "numEndAngle";
+            this.numEndAngle.Size = new System.Drawing.Size(55, 20);
+            this.numEndAngle.TabIndex = 23;
+            this.numEndAngle.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // numStartAngle
+            // 
+            this.numStartAngle.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numStartAngle.Location = new System.Drawing.Point(104, 29);
+            this.numStartAngle.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numStartAngle.Name = "numStartAngle";
+            this.numStartAngle.Size = new System.Drawing.Size(62, 20);
+            this.numStartAngle.TabIndex = 22;
+            // 
+            // numSettle
+            // 
+            this.numSettle.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numSettle.Location = new System.Drawing.Point(104, 3);
+            this.numSettle.Maximum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.numSettle.Name = "numSettle";
+            this.numSettle.Size = new System.Drawing.Size(62, 20);
+            this.numSettle.TabIndex = 17;
+            this.numSettle.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // btnCTAcq
+            // 
+            this.btnCTAcq.Enabled = false;
+            this.btnCTAcq.Location = new System.Drawing.Point(305, 70);
+            this.btnCTAcq.Name = "btnCTAcq";
+            this.btnCTAcq.Size = new System.Drawing.Size(75, 23);
+            this.btnCTAcq.TabIndex = 17;
+            this.btnCTAcq.Text = "Acquire";
+            this.btnCTAcq.UseVisualStyleBackColor = true;
+            this.btnCTAcq.Click += new System.EventHandler(this.btnCTAcq_Click);
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(10, 80);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(93, 13);
+            this.label16.TabIndex = 21;
+            this.label16.Text = "Number of Frames";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(11, 56);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(92, 13);
+            this.label15.TabIndex = 20;
+            this.label15.Text = "Degree Increment";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(176, 32);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(56, 13);
+            this.label14.TabIndex = 19;
+            this.label14.Text = "End Angle";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(15, 32);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(59, 13);
+            this.label13.TabIndex = 18;
+            this.label13.Text = "Start Angle";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(13, 5);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(68, 13);
+            this.label12.TabIndex = 17;
+            this.label12.Text = "Settling Time";
             // 
             // panel6
             // 
             this.panel6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.btnHome);
+            this.panel6.Controls.Add(this.lblCurrAngle);
+            this.panel6.Controls.Add(this.btnMove);
+            this.panel6.Controls.Add(this.label18);
+            this.panel6.Controls.Add(this.numMoveTo);
+            this.panel6.Controls.Add(this.cbMoveType);
+            this.panel6.Controls.Add(this.label17);
             this.panel6.Location = new System.Drawing.Point(828, 27);
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(311, 103);
             this.panel6.TabIndex = 7;
+            // 
+            // btnHome
+            // 
+            this.btnHome.Enabled = false;
+            this.btnHome.Location = new System.Drawing.Point(223, 5);
+            this.btnHome.Name = "btnHome";
+            this.btnHome.Size = new System.Drawing.Size(75, 23);
+            this.btnHome.TabIndex = 28;
+            this.btnHome.Text = "Home";
+            this.btnHome.UseVisualStyleBackColor = true;
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
+            // 
+            // lblCurrAngle
+            // 
+            this.lblCurrAngle.AutoSize = true;
+            this.lblCurrAngle.Location = new System.Drawing.Point(16, 79);
+            this.lblCurrAngle.Name = "lblCurrAngle";
+            this.lblCurrAngle.Size = new System.Drawing.Size(74, 13);
+            this.lblCurrAngle.TabIndex = 27;
+            this.lblCurrAngle.Text = "Current Angle:";
+            // 
+            // btnMove
+            // 
+            this.btnMove.Enabled = false;
+            this.btnMove.Location = new System.Drawing.Point(223, 70);
+            this.btnMove.Name = "btnMove";
+            this.btnMove.Size = new System.Drawing.Size(75, 23);
+            this.btnMove.TabIndex = 17;
+            this.btnMove.Text = "Move";
+            this.btnMove.UseVisualStyleBackColor = true;
+            this.btnMove.Click += new System.EventHandler(this.btnMove_Click);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(13, 48);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(50, 13);
+            this.label18.TabIndex = 26;
+            this.label18.Text = "Move To";
+            // 
+            // numMoveTo
+            // 
+            this.numMoveTo.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numMoveTo.Location = new System.Drawing.Point(69, 43);
+            this.numMoveTo.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numMoveTo.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
+            this.numMoveTo.Name = "numMoveTo";
+            this.numMoveTo.Size = new System.Drawing.Size(62, 20);
+            this.numMoveTo.TabIndex = 25;
+            // 
+            // cbMoveType
+            // 
+            this.cbMoveType.FormattingEnabled = true;
+            this.cbMoveType.Items.AddRange(new object[] {
+            "Relative",
+            "Absolute"});
+            this.cbMoveType.Location = new System.Drawing.Point(69, 7);
+            this.cbMoveType.Name = "cbMoveType";
+            this.cbMoveType.Size = new System.Drawing.Size(85, 21);
+            this.cbMoveType.TabIndex = 15;
+            this.cbMoveType.SelectedIndexChanged += new System.EventHandler(this.cbMoveType_SelectedIndexChanged);
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(6, 10);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(57, 13);
+            this.label17.TabIndex = 25;
+            this.label17.Text = "Movement";
             // 
             // panel7
             // 
             this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel7.Controls.Add(this.trackBar2);
+            this.panel7.Controls.Add(this.trackBar1);
+            this.panel7.Controls.Add(this.label11);
+            this.panel7.Controls.Add(this.label10);
             this.panel7.Location = new System.Drawing.Point(204, 129);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(935, 34);
+            this.panel7.Size = new System.Drawing.Size(935, 46);
             this.panel7.TabIndex = 6;
+            // 
+            // trackBar2
+            // 
+            this.trackBar2.Location = new System.Drawing.Point(482, 2);
+            this.trackBar2.Name = "trackBar2";
+            this.trackBar2.Size = new System.Drawing.Size(288, 45);
+            this.trackBar2.TabIndex = 20;
+            // 
+            // trackBar1
+            // 
+            this.trackBar1.Location = new System.Drawing.Point(68, -1);
+            this.trackBar1.Name = "trackBar1";
+            this.trackBar1.Size = new System.Drawing.Size(288, 45);
+            this.trackBar1.TabIndex = 19;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(443, 10);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(33, 13);
+            this.label11.TabIndex = 18;
+            this.label11.Text = "Level";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(16, 10);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(46, 13);
+            this.label10.TabIndex = 17;
+            this.label10.Text = "Window";
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openDeviceToolStripMenuItem,
+            this.closeDeviceToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1139, 24);
+            this.menuStrip1.TabIndex = 8;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // openDeviceToolStripMenuItem
+            // 
+            this.openDeviceToolStripMenuItem.Name = "openDeviceToolStripMenuItem";
+            this.openDeviceToolStripMenuItem.Size = new System.Drawing.Size(86, 20);
+            this.openDeviceToolStripMenuItem.Text = "Open Device";
+            this.openDeviceToolStripMenuItem.Click += new System.EventHandler(this.openDeviceToolStripMenuItem_Click);
+            // 
+            // closeDeviceToolStripMenuItem
+            // 
+            this.closeDeviceToolStripMenuItem.Name = "closeDeviceToolStripMenuItem";
+            this.closeDeviceToolStripMenuItem.Size = new System.Drawing.Size(86, 20);
+            this.closeDeviceToolStripMenuItem.Text = "Close Device";
+            this.closeDeviceToolStripMenuItem.Visible = false;
+            this.closeDeviceToolStripMenuItem.Click += new System.EventHandler(this.closeDeviceToolStripMenuItem_Click);
+            // 
+            // tmrCurrAngle
+            // 
+            this.tmrCurrAngle.Enabled = true;
+            this.tmrCurrAngle.Tick += new System.EventHandler(this.tmrCurrAngle_Tick);
             // 
             // Form1
             // 
@@ -318,25 +724,38 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "XRayGui";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numAcqCount)).EndInit();
+            this.panel5.ResumeLayout(false);
+            this.panel5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numCtCount)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAngleIncr)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numEndAngle)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numStartAngle)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSettle)).EndInit();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMoveTo)).EndInit();
+            this.panel7.ResumeLayout(false);
+            this.panel7.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem acquireToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.Panel panel1;
@@ -361,6 +780,36 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbGain;
+        private System.Windows.Forms.Button btnAcq;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown numAcqCount;
+        private System.Windows.Forms.NumericUpDown numEndAngle;
+        private System.Windows.Forms.NumericUpDown numStartAngle;
+        private System.Windows.Forms.NumericUpDown numSettle;
+        private System.Windows.Forms.Button btnCTAcq;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TrackBar trackBar2;
+        private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.NumericUpDown numAngleIncr;
+        private System.Windows.Forms.ToolStripStatusLabel tblblCurrAngle;
+        private System.Windows.Forms.Button btnMove;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.NumericUpDown numMoveTo;
+        private System.Windows.Forms.ComboBox cbMoveType;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label lblCurrAngle;
+        private System.Windows.Forms.Button btnHome;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem openDeviceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeDeviceToolStripMenuItem;
+        private System.Windows.Forms.Timer tmrCurrAngle;
+        private System.Windows.Forms.NumericUpDown numCtCount;
     }
 }
 
