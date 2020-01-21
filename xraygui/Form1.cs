@@ -14,25 +14,31 @@ namespace xraygui
 {
     public partial class Form1 : Form
     {
-        public Form1()
+		AcqController acq = new AcqController();
+		MotionController motion = new MotionController();
+
+		public Form1()
         {
             InitializeComponent();
+
+			cbBinning.SelectedIndex = 0;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void doSomething()
         {
-			using (AcqController acq = new AcqController())
-			using (MotionController motion = new MotionController())
 			{
 				Trace.WriteLine("Motion open: " + motion.OpenDevice());
-				Trace.WriteLine("Motion Home: " + motion.Home());
+				//Trace.WriteLine("Motion Home: " + motion.Home());
 				motion.CloseDevice();
 
-
-
 				Trace.WriteLine("Acquire open: " + acq.OpenDevice());
+
+				this.lblStatus.Text = "Current Status: " + acq.state;
+				// Trace.WriteLine("Acquire image: " + acq.AcquireImage()); 
+
 				acq.CloseDevice();
-				
+				this.lblStatus.Text = "Current Status: " + acq.state;
+
 			}
 
 				/* 
@@ -61,20 +67,58 @@ namespace xraygui
 
 					printf("rows: %d\ncolumns: %d\n", rows, columns);
 					Acquisition_CloseAll(); */
-
-				try
-				{
-
-
-
-
-
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(ex.ToString());
-				}
-			 
         }
-    }
+
+		private void acquireToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			doSomething();
+		}
+
+		private void cbBinning_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (acq.state != AcqController.State.OPEN)
+				return;
+
+			ComboBox ourCB = (ComboBox)sender;
+
+			Acq.DETECTOR_BINNING binMode = Acq.DETECTOR_BINNING.BINNING_1x1;
+
+			/*
+				No binning
+				2x2 binning
+				4x4 binning (3x3 R&F)
+				1x2 binning
+				1x4 binning
+			*/
+
+			switch(ourCB.SelectedIndex)
+			{
+				case 0:
+					binMode = Acq.DETECTOR_BINNING.BINNING_1x1;
+					break;
+				case 1:
+					binMode = Acq.DETECTOR_BINNING.BINNING_2x2;
+					break;
+				case 2:
+					binMode = Acq.DETECTOR_BINNING.BINNING_4x4;
+					break;
+				case 3:
+					binMode = Acq.DETECTOR_BINNING.BINNING_1x2;
+					break;
+				case 4:
+					binMode = Acq.DETECTOR_BINNING.BINNING_1x4;
+					break;
+				default:
+					// What?
+					break;
+			}
+
+		}
+
+		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			acq.Dispose();
+			motion.Dispose();
+		}
+	}
 }

@@ -1,0 +1,40 @@
+Settings Section:
+(Gain, integration time, binning mode, and FOV mode all are connected and limit the available options. The detector manual should have a listing of possible settings)
+Gain - adjust gain setting for detector, dropdown menu
+Integration Time - adjust exposure time for detector, dropdown menu
+Binning Mode - adjust detector to 1x1 or 2x2 etc for faster integration time (group pixels together), dropdown menu
+FOV Mode - adjust field of view for faster integration time (limit area of interest), dropdown menu
+(Offset image, gain image, pixel correction all should have the option of none, acquire new, use previously acquired, and pull from file. There are some relationships between these that I'll sort out as offset can only be performed after gain, etc)
+Offset Image - select correction for offset - will need popup to state x-rays must be on and number of images to use
+Gain Image - select correction for gain - will need popup to state x-rays must be off and number of images to use
+Pixel Correction - select correction for dead pixels - This function appears to just have a list of dead pixels that are then ignored. Not sure what needs to happen with this function yet.
+
+
+Acquire Image Section:
+Acquire Image button - acquires image with number of frames averaged (built in function) and kicks up a save dialog or has text box for filename
+Number of Frames to Average
+
+
+Acquire CT Scan Section:
+Settling Time - delay in rotary stage control to decrease shaking after the stage is moved
+Start/End Angle - as described
+Number of Images or Degree Increment - Controls the specific number of steps or spacing between steps. Degree increment will be more useful but there might be scenarios where number of images could be handy
+Average Number of Images - same as acquire image number of frames, allows averaging to improve image quality
+Estimated Time Remaining? - if time, could include this but not necessary
+Acquire CT Scan - run it (kicks up a save dialog or has text box for new folder - images are saved with angle, ie IMAGE 030.0)
+
+
+Rotary Stage Control Section:
+Dial with current position
+Relative Move - move x degrees from current position
+Absolute Move - move to x degrees from zero
+Home Stage (initialize to zero)
+
+
+Window/Level Sliders - scales grayscale values and clamps low/high values to extremes to show specific features. I can help sort out the specific math behind this but we would just need two sliders or an equivalent.
+
+
+Live Image - Show the current image, either from the current acquisition or from a saved file (not necessary but would be nice feature)
+
+
+The only other thing that might be nice is a way to save a video, especially for transients (circuit breaker tripping, etc). We can use outside software to accomplish this if time/money does not permit.

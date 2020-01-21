@@ -145,9 +145,7 @@ typedef struct
 #define HIS_GbIF_MAC 2
 #define HIS_GbIF_NAME 3
 
-#define HIS_GbIF_IP_STATIC	1
-#define HIS_GbIF_IP_DHCP	2
-#define HIS_GbIF_IP_LLA		4
+
 
 //*/
 
@@ -784,7 +782,7 @@ struct discoveryReplyEx
 	char gvcp_ip[16];               //!< Which IP address is used for image transfer
 
 	struct discoveryReplyMsg messages[32]; //!< Info about the received reply packets
-	unsigned messageCount;          //!< How many messages this reply carries
+	UInt32 messageCount;          //!< How many messages this reply carries
 };
 
 /**
