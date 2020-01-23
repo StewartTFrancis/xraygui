@@ -18,63 +18,31 @@ namespace xraygui
 		AcqController acquire = new AcqController();
 		MotionController motion = new MotionController();
 
+		
 		public Form1()
         {
             InitializeComponent();
 
+			cbGain.DataSource = Helpers.gainMap;
+			cbGain.DisplayMember = "Display";
+			cbGain.ValueMember = "Value";
+			cbGain.SelectedIndex = 2;
+
+			cbBinning.DataSource = Helpers.binningMap;
+			cbBinning.DisplayMember = "Display";
+			cbBinning.ValueMember = "Value";
 			cbBinning.SelectedIndex = 0;
+
+			cbFOV.DataSource = Helpers.fovMap;
+			cbFOV.DisplayMember = "Display";
+			cbFOV.ValueMember = "Value";
+			cbFOV.SelectedIndex = 0;
+
+
 			cbMoveType.SelectedIndex = 0;
         }
 
-		private void cbBinning_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (acquire.state != AcqController.State.OPEN)
-				return;
-
-			Acq.DETECTOR_BINNING binMode = mapIndexToBin(((ComboBox)sender).SelectedIndex);
-
-			if (acquire.SetBinningMode(binMode) != Acq.HIS_RETURN.HIS_ALL_OK)
-				MessageBox.Show("Error setting binning mode. Check the log");
-		}
-
-		private Acq.DETECTOR_BINNING mapIndexToBin(int index)
-		{
-			/*
-				No binning
-				2x2 binning
-				4x4 binning (3x3 R&F)
-				1x2 binning
-				1x4 binning
-			*/
-
-			switch (index)
-			{
-				case 0:
-					return Acq.DETECTOR_BINNING.BINNING_1x1;
-				case 1:
-					return Acq.DETECTOR_BINNING.BINNING_2x2;
-				case 2:
-					return Acq.DETECTOR_BINNING.BINNING_4x4;
-				case 3:
-					return Acq.DETECTOR_BINNING.BINNING_1x2;
-				case 4:
-					return Acq.DETECTOR_BINNING.BINNING_1x4;
-				default:
-					// What? If we're here, someone's changed something
-					throw new InvalidOperationException("We got an invalid index in mapIndexToBin");
-			}
-		}
-
-		private MovementType mapIndexToMovement(int index)
-		{
-			if (index == 0)
-				return MovementType.Relative;
-			else if (index == 1)
-				return MovementType.Absolute;
-
-			throw new InvalidOperationException("We got an invalid index in mapIndexToMovement");
-
-		}
+		
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
@@ -90,7 +58,7 @@ namespace xraygui
 
 		private void btnMove_Click(object sender, EventArgs e)
 		{
-			motion.Move((double)numMoveTo.Value, mapIndexToMovement(cbMoveType.SelectedIndex));
+			motion.Move((double)numMoveTo.Value, (MovementType)cbMoveType.SelectedValue);
 		}
 
 		private void closeDeviceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -162,9 +130,36 @@ namespace xraygui
 			}
 		}
 
+		private void cbGain_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			var selValue = ((ComboBox)sender).SelectedValue;
+
+			if (selValue is XRD4343_Gain)
+				acquire.SetGainMode((XRD4343_Gain)selValue);
+		}
+		private void cbBinning_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			var selValue = ((ComboBox)sender).SelectedValue;
+
+			if (selValue is XRD4343_Binning)
+				acquire.SetBinningMode((XRD4343_Binning)selValue);
+		}
+
+		private void cbFOV_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			var selValue = ((ComboBox)sender).SelectedValue;
+
+			if (selValue is XRD4343_FOV)
+				acquire.SetFOVMode((XRD4343_FOV)selValue);
+		}
 		private void cbMoveType_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if(mapIndexToMovement(((ComboBox)sender).SelectedIndex) == MovementType.Absolute)
+			var selValue = ((ComboBox)sender).SelectedValue;
+			
+			if (!(selValue is MovementType))
+				return;
+				
+			if ((MovementType)selValue == MovementType.Absolute)
 			{
 				numMoveTo.Value = numMoveTo.Value < 0 ? numMoveTo.Value + 360 : numMoveTo.Value;
 
@@ -187,5 +182,6 @@ namespace xraygui
 			openDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.CLOSED;
 			closeDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.OPEN;
 		}
+
 	}
 }

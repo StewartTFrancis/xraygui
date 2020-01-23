@@ -542,12 +542,12 @@ namespace xraylib
         /**
         * @ingroup enum
 */
-        // typedef void* XislFtpSession; // ref IntPtr
+        // typedef void* XislFtpSession; // IntPtr
 
         /**
         * @ingroup enum
 */
-        // typedef void* XislFileHandle; // ref IntPtr
+        // typedef void* XislFileHandle; // IntPtr
 
         /**
         * @ingroup enum
@@ -952,7 +952,7 @@ namespace xraylib
         // See: https://stackoverflow.com/questions/5235445/pinvoke-c-function-takes-pointer-to-function-as-argument
 
         /* [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public extern HIS_RETURN Acquisition_SetCallbacksAndMessages(ref IntPtr pAcqDesc,
+        public extern HIS_RETURN Acquisition_SetCallbacksAndMessages(IntPtr pAcqDesc,
                       IntPtr hWnd,
                       uint dwErrorMsg, uint dwLoosingFramesMsg,
                       void (CALLBACK* lpfnEndFrameCallback)(HACQDESC),
@@ -964,48 +964,48 @@ namespace xraylib
         public static extern HIS_RETURN Acquisition_EnumSensors(ref uint pdwNumSensors, bool bEnableIRQ, bool bAlwaysOpen);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_GetNextSensor(ref IntPtr Pos, ref IntPtr phAcqDesc);
+        public static extern HIS_RETURN Acquisition_GetNextSensor(ref IntPtr Pos, IntPtr phAcqDesc);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_GetCommChannel(ref IntPtr pAcqDesc, ref uint pdwChannelType, ref int pnChannelNr);
+        public static extern HIS_RETURN Acquisition_GetCommChannel(IntPtr pAcqDesc, ref uint pdwChannelType, ref int pnChannelNr);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_DefineDestBuffers(ref IntPtr pAcqDesc, ref ushort[] pProcessedData, uint nFrames, uint nRows, uint nColumns);
+        public static extern HIS_RETURN Acquisition_DefineDestBuffers(IntPtr pAcqDesc, ref ushort[] pProcessedData, uint nFrames, uint nRows, uint nColumns);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_Image(ref IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, ref ushort[] pwOffsetData, ref uint[] pdwGainData, ref uint[] pdwPxlCorrList);
+        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, ref ushort[] pwOffsetData, ref uint[] pdwGainData, ref uint[] pdwPxlCorrList);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_Image_Ex(ref IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt,
+        public static extern HIS_RETURN Acquisition_Acquire_Image_Ex(IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt,
                                               ref ushort pwOffsetData, uint dwGainFrames, ref ushort pwGainData,
                                               ref ushort pwGainAvgData, ref uint pdwGainData, ref uint pdwPxlCorrList);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Abort(ref IntPtr hAcqDesc);
+        public static extern HIS_RETURN Acquisition_Abort(IntPtr hAcqDesc);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_SetFPGACameraMode(ref IntPtr hAcqDesc, FPGAType FPGACommand, bool bInverse);
+        public static extern HIS_RETURN Acquisition_SetFPGACameraMode(IntPtr hAcqDesc, FPGAType FPGACommand, bool bInverse);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_SetCameraMode(ref IntPtr hAcqDesc, uint dwMode);
+        public static extern HIS_RETURN Acquisition_SetCameraMode(IntPtr hAcqDesc, uint dwMode);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage(ref IntPtr hAcqDesc, ref ushort pOffsetData, uint nRows, uint nCols, uint nFrames);
+        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage(IntPtr hAcqDesc, ref ushort pOffsetData, uint nRows, uint nCols, uint nFrames);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage_Ex(ref IntPtr hAcqDesc, ref ushort pOffsetData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
+        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage_Ex(IntPtr hAcqDesc, ref ushort pOffsetData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_GainImage(ref IntPtr hAcqDesc, ref ushort pOffsetData, ref ushort pGainData, uint nRows, uint nCols, uint nFrames);
+        public static extern HIS_RETURN Acquisition_Acquire_GainImage(IntPtr hAcqDesc, ref ushort pOffsetData, ref ushort pGainData, uint nRows, uint nCols, uint nFrames);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex(ref IntPtr hAcqDesc, ref ushort pOffsetData, ref uint pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
+        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex(IntPtr hAcqDesc, ref ushort pOffsetData, ref uint pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_CreateGainMap(ref ushort pGainData, ref ushort pGainAVG, int nCount, int nFrame);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_CreatePixelMap(ref ushort pData, int nDataRows, int nDataColumns, ref int pCorrList, ref int nCorrListSize);
+        public static extern HIS_RETURN Acquisition_CreatePixelMap(ref ushort[] pData, uint nDataRows, uint nDataColumns, ref uint[] pCorrList, ref uint nCorrListSize);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoOffsetCorrection(ushort* pSource, ushort* pDest, ushort* pOffsetData, int nCount);
@@ -1036,142 +1036,142 @@ namespace xraylib
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoPixelCorrection(ushort* pData, int* pCorrList);
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_IsAcquiringData(ref IntPtr hAcqDesc);
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_IsAcquiringData(IntPtr hAcqDesc);
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Close(ref IntPtr hAcqDesc);
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+                public static extern HIS_RETURN Acquisition_Close(IntPtr hAcqDesc);
 
                 [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
                 public static extern HIS_RETURN Acquisition_CloseAll();
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetReady(ref IntPtr hAcqDesc, bool bFlag);
+        //        public static extern HIS_RETURN Acquisition_SetReady(IntPtr hAcqDesc, bool bFlag);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetReady(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_GetReady(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetErrorCode(ref IntPtr hAcqDesc, uint* dwHISError, uint* dwBoardError);
+        //        public static extern HIS_RETURN Acquisition_GetErrorCode(IntPtr hAcqDesc, uint* dwHISError, uint* dwBoardError);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_GetConfiguration(ref IntPtr hAcqDesc,
+        public static extern HIS_RETURN Acquisition_GetConfiguration(IntPtr hAcqDesc,
                             ref uint dwFrames, ref uint dwRows, ref uint dwColumns, ref uint dwDataType,
                             ref uint dwSortFlags, ref bool bIRQEnabled, ref ulong dwAcqType, ref ulong dwSystemID,
                             ref ulong dwSyncMode, ref ulong dwHwAccess);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_GetIntTimes(ref IntPtr hAcqDesc, ref double[] dblIntTime, ref int nIntTimes);
+        public static extern HIS_RETURN Acquisition_GetIntTimes(IntPtr hAcqDesc, ref double[] dblIntTime, ref int nIntTimes);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetWinHandle(ref IntPtr hAcqDesc, HWND* hWnd);
+        //        public static extern HIS_RETURN Acquisition_GetWinHandle(IntPtr hAcqDesc, HWND* hWnd);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetActFrame(ref IntPtr hAcqDesc, uint* dwActAcqFrame, uint* dwActSecBuffFrame);
+        //        public static extern HIS_RETURN Acquisition_GetActFrame(IntPtr hAcqDesc, uint* dwActAcqFrame, uint* dwActSecBuffFrame);
         //# ifdef XIS_OS_64
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetAcqData(ref IntPtr hAcqDesc, void* AcqData);
+        //        public static extern HIS_RETURN Acquisition_SetAcqData(IntPtr hAcqDesc, void* AcqData);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetAcqData(ref IntPtr hAcqDesc, void** VoidAcqData);
+        //        public static extern HIS_RETURN Acquisition_GetAcqData(IntPtr hAcqDesc, void** VoidAcqData);
         //#else
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetAcqData(ref IntPtr hAcqDesc, uint dwAcqData);
+        //        public static extern HIS_RETURN Acquisition_SetAcqData(IntPtr hAcqDesc, uint dwAcqData);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetAcqData(ref IntPtr hAcqDesc, uint* dwAcqData);
+        //        public static extern HIS_RETURN Acquisition_GetAcqData(IntPtr hAcqDesc, uint* dwAcqData);
         //#endif // XIS_OS_64
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetHwHeaderInfo(ref IntPtr hAcqDesc, CHwHeaderInfo* pInfo);
+        //        public static extern HIS_RETURN Acquisition_GetHwHeaderInfo(IntPtr hAcqDesc, CHwHeaderInfo* pInfo);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetFrameSync(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_SetFrameSync(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetFrameSyncMode(ref IntPtr hAcqDesc, uint dwMode);
+        //        public static extern HIS_RETURN Acquisition_SetFrameSyncMode(IntPtr hAcqDesc, uint dwMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetTimerSync(ref IntPtr hAcqDesc, uint* dwCycleTime);
+        //        public static extern HIS_RETURN Acquisition_SetTimerSync(IntPtr hAcqDesc, uint* dwCycleTime);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_AbortCurrentFrame(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_AbortCurrentFrame(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetCorrData(ref IntPtr hAcqDesc, unsigned short* pwOffsetData, uint* pdwGainData, uint* pdwPxlCorrList);
+        //        public static extern HIS_RETURN Acquisition_SetCorrData(IntPtr hAcqDesc, unsigned short* pwOffsetData, uint* pdwGainData, uint* pdwPxlCorrList);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetCorrData_Ex(ref IntPtr hAcqDesc, unsigned short* pwOffsetData, unsigned short* pwGainData,
+        //        public static extern HIS_RETURN Acquisition_SetCorrData_Ex(IntPtr hAcqDesc, unsigned short* pwOffsetData, unsigned short* pwGainData,
         //                                            unsigned short* pwGainAvgData, uint nGainFrames,
         //                                            uint* pdwGainData, uint* pdwPxlCorrList);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetCorrData(ref IntPtr hAcqDesc, unsigned short** ppwOffsetData, uint** ppdwGainData, uint** ppdwPxlCorrList);
+        //        public static extern HIS_RETURN Acquisition_GetCorrData(IntPtr hAcqDesc, unsigned short** ppwOffsetData, uint** ppdwGainData, uint** ppdwPxlCorrList);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetCorrData_Ex(ref IntPtr hAcqDesc, unsigned short** ppwOffsetData, unsigned short** ppwGainData,
+        //        public static extern HIS_RETURN Acquisition_GetCorrData_Ex(IntPtr hAcqDesc, unsigned short** ppwOffsetData, unsigned short** ppwGainData,
         //                                            unsigned short** ppwGainAvgData, uint** nGainFrames, uint** pdwGainData, uint** pdwPxlCorrList);
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetCameraGain(ref IntPtr hAcqDesc, ushort wMode);
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_SetCameraGain(IntPtr hAcqDesc, XRD4343_Gain wMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetFrameSyncTimeMode(ref IntPtr hAcqDesc, unsigned int uiMode, unsigned int dwDelayTime);
+        //        public static extern HIS_RETURN Acquisition_SetFrameSyncTimeMode(IntPtr hAcqDesc, unsigned int uiMode, unsigned int dwDelayTime);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex_ROI(ref IntPtr hAcqDesc, ushort* pOffsetData, uint* pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt, uint uiULX, uint uiULY, uint uiBRX, uint uiBRY, uint uiMode);
+        //        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex_ROI(IntPtr hAcqDesc, ushort* pOffsetData, uint* pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt, uint uiULX, uint uiULY, uint uiBRX, uint uiBRY, uint uiMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Acquire_Image_PreloadCorr(ref IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt);
+        //        public static extern HIS_RETURN Acquisition_Acquire_Image_PreloadCorr(IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage_PreloadCorr(ref IntPtr hAcqDesc, ushort* pwOffsetData, uint nRows, uint nColumns, uint nFrames, uint dwOpt);
+        //        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage_PreloadCorr(IntPtr hAcqDesc, ushort* pwOffsetData, uint nRows, uint nColumns, uint nFrames, uint dwOpt);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetHwHeader(ref IntPtr hAcqDesc, byte* pData, unsigned int uiSize);
+        //        public static extern HIS_RETURN Acquisition_GetHwHeader(IntPtr hAcqDesc, byte* pData, unsigned int uiSize);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex_ROI_PreloadCorr(ref IntPtr hAcqDesc, uint* pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt, uint uiULX, uint uiULY, uint uiBRX, uint uiBRY, uint uiMode);
+        //        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex_ROI_PreloadCorr(IntPtr hAcqDesc, uint* pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt, uint uiULX, uint uiULY, uint uiBRX, uint uiBRY, uint uiMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Acquire_GainImage_PreloadCorr(ref IntPtr hAcqDesc, uint* pGainData, uint nRows, uint nCols, uint nFrames);
+        //        public static extern HIS_RETURN Acquisition_Acquire_GainImage_PreloadCorr(IntPtr hAcqDesc, uint* pGainData, uint nRows, uint nCols, uint nFrames);
 
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_SetCameraBinningMode(ref IntPtr hAcqDesc, DETECTOR_BINNING wMode);
+        public static extern HIS_RETURN Acquisition_SetCameraBinningMode(IntPtr hAcqDesc, XRD4343_Binning wMode);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_GetCameraBinningMode(ref IntPtr hAcqDesc, ref DETECTOR_BINNING wMode);
+        public static extern HIS_RETURN Acquisition_GetCameraBinningMode(IntPtr hAcqDesc, ref XRD4343_Binning wMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_ResetFrameCnt(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_ResetFrameCnt(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetLatestFrameHeader(ref IntPtr hAcqDesc, CHwHeaderInfo* pInfo, CHwHeaderInfoEx* pInfoEx);
+        //        public static extern HIS_RETURN Acquisition_GetLatestFrameHeader(IntPtr hAcqDesc, CHwHeaderInfo* pInfo, CHwHeaderInfoEx* pInfoEx);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetHwHeaderInfoEx(ref IntPtr hAcqDesc, CHwHeaderInfo* pInfo, CHwHeaderInfoEx* pInfoEx);
+        //        public static extern HIS_RETURN Acquisition_GetHwHeaderInfoEx(IntPtr hAcqDesc, CHwHeaderInfo* pInfo, CHwHeaderInfoEx* pInfoEx);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetCameraTriggerMode(ref IntPtr hAcqDesc, ushort wMode);
+        //        public static extern HIS_RETURN Acquisition_SetCameraTriggerMode(IntPtr hAcqDesc, ushort wMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetCameraTriggerMode(ref IntPtr hAcqDesc, ushort* wMode);
-
-
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetRotationAngle(ref IntPtr hAcqDesc, long lRotAngle); // FG-E only can be -90 | 0 | 90
-
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetRotationAngle(ref IntPtr hAcqDesc, long* lRotAngle);
-
+        //        public static extern HIS_RETURN Acquisition_GetCameraTriggerMode(IntPtr hAcqDesc, ushort* wMode);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_Init(ref IntPtr* pref IntPtr,
+        //        public static extern HIS_RETURN Acquisition_SetRotationAngle(IntPtr hAcqDesc, long lRotAngle); // FG-E only can be -90 | 0 | 90
+
+        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        //        public static extern HIS_RETURN Acquisition_GetRotationAngle(IntPtr hAcqDesc, long* lRotAngle);
+
+
+
+        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        //        public static extern HIS_RETURN Acquisition_GbIF_Init(IntPtr* pIntPtr,
         //                                                            int nChannelNr,
         //                                                            bool bEnableIRQ,
         //                                                            uint uiRows, uint uiColumns,
@@ -1214,13 +1214,13 @@ namespace xraylib
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_GetPacketDelay(ref IntPtr hAcqDesc,
+        //        public static extern HIS_RETURN Acquisition_GbIF_GetPacketDelay(IntPtr hAcqDesc,
         //                                                            long* lPacketdelay
         //                                                        );
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_SetPacketDelay(ref IntPtr hAcqDesc,
+        //        public static extern HIS_RETURN Acquisition_GbIF_SetPacketDelay(IntPtr hAcqDesc,
         //                                                            long lPacketdelay
         //                                                    );
 
@@ -1234,20 +1234,20 @@ namespace xraylib
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_GetFilterDrvState(ref IntPtr hAcqDesc
+        //        public static extern HIS_RETURN Acquisition_GbIF_GetFilterDrvState(IntPtr hAcqDesc
 
 
         //                                                      );
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_CheckNetworkSpeed(ref IntPtr hAcqDesc, ushort* wTiming, long* lPacketDelay, long lMaxNetworkLoadPercent);
+        //        public static extern HIS_RETURN Acquisition_GbIF_CheckNetworkSpeed(IntPtr hAcqDesc, ushort* wTiming, long* lPacketDelay, long lMaxNetworkLoadPercent);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_GetDetectorProperties(ref IntPtr hAcqDesc, GBIF_Detector_Properties* pDetectorProperties);
+        //        public static extern HIS_RETURN Acquisition_GbIF_GetDetectorProperties(IntPtr hAcqDesc, GBIF_Detector_Properties* pDetectorProperties);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GbIF_GetDeviceParams(ref IntPtr hAcqDesc, GBIF_DEVICE_PARAM* pDevice);
+        //        public static extern HIS_RETURN Acquisition_GbIF_GetDeviceParams(IntPtr hAcqDesc, GBIF_DEVICE_PARAM* pDevice);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
@@ -1285,7 +1285,7 @@ namespace xraylib
         //// FTP specific
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_FTP_InitSession(ref IntPtr hAcqDesc, XislFtpSession* session);
+        //        public static extern HIS_RETURN Acquisition_FTP_InitSession(IntPtr hAcqDesc, XislFtpSession* session);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_FTP_CloseSession(XislFtpSession session);
@@ -1312,51 +1312,51 @@ namespace xraylib
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acq_wpe_LoadCorrectionImageToBuffer(ref IntPtr hAcqDesc, const char* pccCorrectionFilePath, ProcScriptOperation Operation);
+        //        public static extern HIS_RETURN Acq_wpe_LoadCorrectionImageToBuffer(IntPtr hAcqDesc, const char* pccCorrectionFilePath, ProcScriptOperation Operation);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_AcknowledgeImage(ref IntPtr hAcqDesc, const char* tag);
+        //        public static extern HIS_RETURN Acquisition_AcknowledgeImage(IntPtr hAcqDesc, const char* tag);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_wpe_SetUniqueImageTag(ref IntPtr hAcqDesc, const char* imageTag);
+        //        public static extern HIS_RETURN Acquisition_wpe_SetUniqueImageTag(IntPtr hAcqDesc, const char* imageTag);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Reset_OnboardOptions(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_Reset_OnboardOptions(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptionsPostOffset(ref IntPtr hAcqDesc, bool bNoOnboardCorr, bool bSendPreviewFrist, bool bSendFULLFirst, bool bEnableAckFirst, bool bEnableAckSecond, bool bEnableOffsetFirst, bool bEnablePostOffsetCorr, bool bGain, bool bPixel);
+        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptionsPostOffset(IntPtr hAcqDesc, bool bNoOnboardCorr, bool bSendPreviewFrist, bool bSendFULLFirst, bool bEnableAckFirst, bool bEnableAckSecond, bool bEnableOffsetFirst, bool bEnablePostOffsetCorr, bool bGain, bool bPixel);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptionsPostOffsetEx(ref IntPtr hAcqDesc, bool bNoOnboardCorr, bool bSendPreviewFrist, bool bSendFULLFirst, bool bEnableAckFirst, bool bEnableAckSecond, bool bEnableOffsetFirst, bool bEnablePostOffsetCorr, bool bGain, bool bPixel, bool bStoreOffsetToSD);
-
-
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_wpe_SetMaxOnboardCorrValue(ref IntPtr hAcqDesc, unsigned short usMax, unsigned short usReplace);
+        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptionsPostOffsetEx(IntPtr hAcqDesc, bool bNoOnboardCorr, bool bSendPreviewFrist, bool bSendFULLFirst, bool bEnableAckFirst, bool bEnableAckSecond, bool bEnableOffsetFirst, bool bEnablePostOffsetCorr, bool bGain, bool bPixel, bool bStoreOffsetToSD);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Set_OnboardOffsetImageAcquisition(ref IntPtr hAcqDesc, bool bEnable, bool bSend, bool bStoreSD);
-
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptions(ref IntPtr hAcqDesc, bool bStoreSD, bool bOffset, bool bGain, bool bPixel);
+        //        public static extern HIS_RETURN Acquisition_wpe_SetMaxOnboardCorrValue(IntPtr hAcqDesc, unsigned short usMax, unsigned short usReplace);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_ActivateServiceMode(ref IntPtr hAcqDesc, bool bActivate);
+        //        public static extern HIS_RETURN Acquisition_Set_OnboardOffsetImageAcquisition(IntPtr hAcqDesc, bool bEnable, bool bSend, bool bStoreSD);
+
+        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptions(IntPtr hAcqDesc, bool bStoreSD, bool bOffset, bool bGain, bool bPixel);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetCameraROI(ref IntPtr hAcqDesc, unsigned short usActivateGrp); // val 2010-05-12
-
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetCameraROI(ref IntPtr hAcqDesc, unsigned short* usActivateGrp); // val 2010-05-17
+        //        public static extern HIS_RETURN Acquisition_ActivateServiceMode(IntPtr hAcqDesc, bool bActivate);
 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetTriggerOutSignalOptions(ref IntPtr hAcqDesc, unsigned short usTiggerOutSignalMode,
+        //        public static extern HIS_RETURN Acquisition_SetCameraROI(IntPtr hAcqDesc, unsigned short usActivateGrp); // val 2010-05-12
+
+        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        //        public static extern HIS_RETURN Acquisition_GetCameraROI(IntPtr hAcqDesc, unsigned short* usActivateGrp); // val 2010-05-17
+
+
+        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        //        public static extern HIS_RETURN Acquisition_SetTriggerOutSignalOptions(IntPtr hAcqDesc, unsigned short usTiggerOutSignalMode,
         //                                                                            unsigned short usEP_SeqLength,
         //                                                                            unsigned short usEP_FirstBrightFrm,
         //                                                                            unsigned short usEP_LastBrightFrm,
@@ -1392,14 +1392,14 @@ namespace xraylib
         //        // mk 2013-04-19 end
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetTriggerOutStatus(ref IntPtr hAcqDesc, int* iTriggerStatus); /// 2013-04-22 Val GetTriggerStatus GbIF 
+        //        public static extern HIS_RETURN Acquisition_GetTriggerOutStatus(IntPtr hAcqDesc, int* iTriggerStatus); /// 2013-04-22 Val GetTriggerStatus GbIF 
 
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetCameraFOVMode(ref IntPtr hAcqDesc, ushort wMode); // 2013-07-03 val R&F Field Of View 
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_SetCameraFOVMode(IntPtr hAcqDesc,  XRD4343_FOV wMode); // 2013-07-03 val R&F Field Of View 
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetCameraFOVMode(ref IntPtr hAcqDesc, ushort* wMode); // 2013-07-03 val R&F Field Of View 
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_GetCameraFOVMode(IntPtr hAcqDesc, ref XRD4343_FOV wMode); // 2013-07-03 val R&F Field Of View 
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
@@ -1425,13 +1425,13 @@ namespace xraylib
         //        public static extern HIS_RETURN Acquisition_GetVersion(int* major, int* minor, int* release, int* build);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetProvidedEnhancedFeatures(ref IntPtr hAcqDesc, unsigned int* uiEnhancesFeatures);
+        //        public static extern HIS_RETURN Acquisition_GetProvidedEnhancedFeatures(IntPtr hAcqDesc, unsigned int* uiEnhancesFeatures);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptionPreview(ref IntPtr hAcqDesc, bool bEnablePreview, bool bPreviewOptionSendFull, OnboardBinningMode eMode, unsigned int uiSelectedScript);
+        //        public static extern HIS_RETURN Acquisition_Set_OnboardOptionPreview(IntPtr hAcqDesc, bool bEnablePreview, bool bPreviewOptionSendFull, OnboardBinningMode eMode, unsigned int uiSelectedScript);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_IsPreviewImage(ref IntPtr hAcqDesc, unsigned int* uiIsPreview);
+        //        public static extern HIS_RETURN Acquisition_IsPreviewImage(IntPtr hAcqDesc, unsigned int* uiIsPreview);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetPhototimedParams(ref IntPtr hAcqDesc, unsigned short usNrOfScrubs, unsigned short usMaxDelay);
+        //        public static extern HIS_RETURN Acquisition_SetPhototimedParams(IntPtr hAcqDesc, unsigned short usNrOfScrubs, unsigned short usMaxDelay);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_EnableLogging(bool onOff);
@@ -1462,102 +1462,102 @@ namespace xraylib
         //        public static extern HIS_RETURN Acquisition_LoadXISFileToMemory(const char* filename, void* pMemoryFileBuffer, size_t bufferSize);
 
         //[DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetDACOffsetFloorValueByMode(ref IntPtr hAcqDesc, unsigned int uiMode);
+        //        public static extern HIS_RETURN Acquisition_SetDACOffsetFloorValueByMode(IntPtr hAcqDesc, unsigned int uiMode);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetDACOffsetFloorValueInFlash(ref IntPtr hAcqDesc, unsigned int uiMode, ushort wValue);
+        //        public static extern HIS_RETURN Acquisition_SetDACOffsetFloorValueInFlash(IntPtr hAcqDesc, unsigned int uiMode, ushort wValue);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetDACOffsetFloorValueFromFlash(ref IntPtr hAcqDesc, unsigned int uiMode, ushort* pwValue);
+        //        public static extern HIS_RETURN Acquisition_GetDACOffsetFloorValueFromFlash(IntPtr hAcqDesc, unsigned int uiMode, ushort* pwValue);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetDetectorProperties(ref IntPtr hAcqDesc, GBIF_Detector_Properties* pDetectorProperties);
+        //        public static extern HIS_RETURN Acquisition_GetDetectorProperties(IntPtr hAcqDesc, GBIF_Detector_Properties* pDetectorProperties);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetDACoffset(ref IntPtr hAcqDesc, ushort wDACoffsetValue);
+        //        public static extern HIS_RETURN Acquisition_SetDACoffset(IntPtr hAcqDesc, ushort wDACoffsetValue);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetDACoffsetBinningFPS(ref IntPtr hAcqDesc, ushort wBinningMode, double dblFps, ushort* pwValueToFPGA);
+        //        public static extern HIS_RETURN Acquisition_SetDACoffsetBinningFPS(IntPtr hAcqDesc, ushort wBinningMode, double dblFps, ushort* pwValueToFPGA);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Enable_EMI_Data_Readout(ref IntPtr hAcqDesc, unsigned int uiOnOff);
+        //        public static extern HIS_RETURN Acquisition_Enable_EMI_Data_Readout(IntPtr hAcqDesc, unsigned int uiOnOff);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetGridSensorStatus(ref IntPtr hAcqDesc, unsigned int* uiStatus);
+        //        public static extern HIS_RETURN Acquisition_GetGridSensorStatus(IntPtr hAcqDesc, unsigned int* uiStatus);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetConnectionStatus(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_GetConnectionStatus(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Set_FPGA_Power_Mode(ref IntPtr hAcqDesc, unsigned int uiMode);
+        //        public static extern HIS_RETURN Acquisition_Set_FPGA_Power_Mode(IntPtr hAcqDesc, unsigned int uiMode);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetTailTimeforTriggerMode(ref IntPtr hAcqDesc, unsigned short usTailTime, XIS_DetectorTriggerMode eTriggerMode);
+        //        public static extern HIS_RETURN Acquisition_SetTailTimeforTriggerMode(IntPtr hAcqDesc, unsigned short usTailTime, XIS_DetectorTriggerMode eTriggerMode);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetEventCallback(ref IntPtr hAcqDesc, XIS_EventCallback EventCallback, void* userData);
+        //        public static extern HIS_RETURN Acquisition_SetEventCallback(IntPtr hAcqDesc, XIS_EventCallback EventCallback, void* userData);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_DisableEventCallback(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_DisableEventCallback(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_ResetOnboardShockEvent(ref IntPtr hAcqDesc, unsigned int latestShock_Timestamp);
+        //        public static extern HIS_RETURN Acquisition_ResetOnboardShockEvent(IntPtr hAcqDesc, unsigned int latestShock_Timestamp);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetSDCardForceFsck(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_SetSDCardForceFsck(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_AckSDCardForceFsck(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_AckSDCardForceFsck(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_AckSDCardForceFsckError(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_AckSDCardForceFsckError(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetSDCardInfo(ref IntPtr hAcqDesc, unsigned int* total, unsigned int* avail);
+        //        public static extern HIS_RETURN Acquisition_GetSDCardInfo(IntPtr hAcqDesc, unsigned int* total, unsigned int* avail);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetFakeTemperature(ref IntPtr hAcqDesc, bool bEnableFakeMode, int iFakeTemperature);
+        //        public static extern HIS_RETURN Acquisition_SetFakeTemperature(IntPtr hAcqDesc, bool bEnableFakeMode, int iFakeTemperature);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_IdentifyDevice(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_IdentifyDevice(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Resend_All_Messages(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_Resend_All_Messages(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetLocation(ref IntPtr hAcqDesc, unsigned int* location);
+        //        public static extern HIS_RETURN Acquisition_GetLocation(IntPtr hAcqDesc, unsigned int* location);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetNetwork(ref IntPtr hAcqDesc, unsigned int* network);
+        //        public static extern HIS_RETURN Acquisition_GetNetwork(IntPtr hAcqDesc, unsigned int* network);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetNetworkSpeed(ref IntPtr hAcqDesc, unsigned int network);
+        //        public static extern HIS_RETURN Acquisition_SetNetworkSpeed(IntPtr hAcqDesc, unsigned int network);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetIdleTimeout(ref IntPtr hAcqDesc, unsigned short timeout);
+        //        public static extern HIS_RETURN Acquisition_SetIdleTimeout(IntPtr hAcqDesc, unsigned short timeout);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetChargeMode(ref IntPtr hAcqDesc, byte charge_mode);
+        //        public static extern HIS_RETURN Acquisition_SetChargeMode(IntPtr hAcqDesc, byte charge_mode);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_VerifyGenuineness(ref IntPtr hAcqDesc, char (* msg)[128], size_t* msg_len, byte (* md)[20]);
+        //        public static extern HIS_RETURN Acquisition_VerifyGenuineness(IntPtr hAcqDesc, char (* msg)[128], size_t* msg_len, byte (* md)[20]);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetPrivateKey(ref IntPtr hAcqDesc, byte (* key_old)[64], byte (* key_new)[64]);
+        //        public static extern HIS_RETURN Acquisition_SetPrivateKey(IntPtr hAcqDesc, byte (* key_old)[64], byte (* key_new)[64]);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetTemperatureTimeout(ref IntPtr hAcqDesc, unsigned short timeout);
+        //        public static extern HIS_RETURN Acquisition_SetTemperatureTimeout(IntPtr hAcqDesc, unsigned short timeout);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_ResetTemperatureTimeout(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_ResetTemperatureTimeout(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetTemperatureThresholds(ref IntPtr hAcqDesc, unsigned int threshold_warning, unsigned int threshold_critical);
+        //        public static extern HIS_RETURN Acquisition_SetTemperatureThresholds(IntPtr hAcqDesc, unsigned int threshold_warning, unsigned int threshold_critical);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetTemperatureThresholds(ref IntPtr hAcqDesc, unsigned int* threshold_warning, unsigned int* threshold_critical);
+        //        public static extern HIS_RETURN Acquisition_GetTemperatureThresholds(IntPtr hAcqDesc, unsigned int* threshold_warning, unsigned int* threshold_critical);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetBatteryStatus(ref IntPtr hAcqDesc, XRpad_BatteryStatus* batteryStatus);
+        //        public static extern HIS_RETURN Acquisition_GetBatteryStatus(IntPtr hAcqDesc, XRpad_BatteryStatus* batteryStatus);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Get_Current_Voltage(ref IntPtr hAcqDesc, DETECTOR_CURRENT_VOLTAGE* pstructCurrentVoltage);
+        //        public static extern HIS_RETURN Acquisition_Get_Current_Voltage(IntPtr hAcqDesc, DETECTOR_CURRENT_VOLTAGE* pstructCurrentVoltage);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_CreateFakeShockWarningLevel(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_CreateFakeShockWarningLevel(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_CreateFakeShockCriticalLevel(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_CreateFakeShockCriticalLevel(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_FactoryResetShock(ref IntPtr hAcqDesc);
+        //        public static extern HIS_RETURN Acquisition_FactoryResetShock(IntPtr hAcqDesc);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetSystemTime(ref IntPtr hAcqDesc, char* cDateTime);
+        //        public static extern HIS_RETURN Acquisition_SetSystemTime(IntPtr hAcqDesc, char* cDateTime);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetPowerstate(ref IntPtr hAcqDesc, unsigned int* powerstate);
+        //        public static extern HIS_RETURN Acquisition_GetPowerstate(IntPtr hAcqDesc, unsigned int* powerstate);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetAutoPowerOnLocations(ref IntPtr hAcqDesc, unsigned int* autopoweronlocations);
+        //        public static extern HIS_RETURN Acquisition_GetAutoPowerOnLocations(IntPtr hAcqDesc, unsigned int* autopoweronlocations);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetAutoPowerOnLocations(ref IntPtr hAcqDesc, unsigned int autopoweronlocations);
+        //        public static extern HIS_RETURN Acquisition_SetAutoPowerOnLocations(IntPtr hAcqDesc, unsigned int autopoweronlocations);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetChargeMode(ref IntPtr hAcqDesc, byte* charge_mode_req, byte* charge_mode_charger);
+        //        public static extern HIS_RETURN Acquisition_GetChargeMode(IntPtr hAcqDesc, byte* charge_mode_req, byte* charge_mode_charger);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetSDCardTimeout(ref IntPtr hAcqDesc, unsigned short sdcard_timeout);
+        //        public static extern HIS_RETURN Acquisition_SetSDCardTimeout(IntPtr hAcqDesc, unsigned short sdcard_timeout);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetSDCardTimeout(ref IntPtr hAcqDesc, unsigned short* sdcard_timeout);
+        //        public static extern HIS_RETURN Acquisition_GetSDCardTimeout(IntPtr hAcqDesc, unsigned short* sdcard_timeout);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetVersionInfo(ref IntPtr hAcqDesc, XRpad_VersionInfo* versionInfo);
+        //        public static extern HIS_RETURN Acquisition_GetVersionInfo(IntPtr hAcqDesc, XRpad_VersionInfo* versionInfo);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetIpAdress(ref IntPtr hAcqDesc, const char** ipAddress);
+        //        public static extern HIS_RETURN Acquisition_GetIpAdress(IntPtr hAcqDesc, const char** ipAddress);
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_Test_SDCardPerformance(ref IntPtr hAcqDesc, unsigned int buffersize,
+        //        public static extern HIS_RETURN Acquisition_Test_SDCardPerformance(IntPtr hAcqDesc, unsigned int buffersize,
         //                                                      double* wbitrate, unsigned int* wmicroseconds,
         //                                                      double* rbitrate, unsigned int* rmicroseconds);
 
@@ -2236,4 +2236,31 @@ namespace xraylib
                   );
     }
 
+    public enum XRD4343_Gain : uint
+    {
+        eADU_29 = 1,
+        eADU_57 = 2,
+        eADU_114_default = 3,
+        eADU_229 = 4,
+        eADU_457 = 5,
+        eADU_686 = 6,
+        eADU_914 = 7,
+    }
+
+    public enum XRD4343_Binning : uint
+    {
+        b1x1 = 1,
+        b2x2 = 2,
+        b3x3 = 3
+    }
+
+    public enum XRD4343_FOV : ushort
+    {
+        f432x432mm2 = 1,
+        f288x288mm2 = 2,
+        f216x216mm2 = 3,
+        f432x216mm2 = 4,
+        f432x72mm2 = 5
+    }
 }
+

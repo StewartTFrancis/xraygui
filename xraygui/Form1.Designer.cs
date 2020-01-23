@@ -222,6 +222,7 @@
             this.cbFOV.Name = "cbFOV";
             this.cbFOV.Size = new System.Drawing.Size(121, 21);
             this.cbFOV.TabIndex = 7;
+            this.cbFOV.SelectedIndexChanged += new System.EventHandler(this.cbFOV_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -235,12 +236,6 @@
             // cbBinning
             // 
             this.cbBinning.FormattingEnabled = true;
-            this.cbBinning.Items.AddRange(new object[] {
-            "No binning",
-            "2x2 binning",
-            "4x4 binning (3x3 R&F)",
-            "1x2 binning",
-            "1x4 binning"});
             this.cbBinning.Location = new System.Drawing.Point(76, 86);
             this.cbBinning.Name = "cbBinning";
             this.cbBinning.Size = new System.Drawing.Size(121, 21);
@@ -289,6 +284,7 @@
             this.cbGain.Name = "cbGain";
             this.cbGain.Size = new System.Drawing.Size(121, 21);
             this.cbGain.TabIndex = 0;
+            this.cbGain.SelectedIndexChanged += new System.EventHandler(this.cbGain_SelectedIndexChanged);
             // 
             // panel3
             // 

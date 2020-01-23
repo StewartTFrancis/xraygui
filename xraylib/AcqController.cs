@@ -29,6 +29,10 @@ namespace xraylib
         int nIntTimes = 12;
 
         bool bufferGood = false;
+        bool configGood = false;
+
+        uint corrListSize = 0;
+        uint[] corrList = null;
 
         public enum State
         {
@@ -36,6 +40,10 @@ namespace xraylib
             OPEN,
             DISPOSED
         }
+
+        XRD4343_FOV fov = XRD4343_FOV.f432x432mm2;
+        XRD4343_Binning binning = XRD4343_Binning.b1x1;
+        XRD4343_Gain gain = XRD4343_Gain.eADU_114_default;
 
         public AcqController()
         {}
@@ -60,10 +68,6 @@ namespace xraylib
             {
                 deviceHandle = IntPtr.Zero;
 
-                dwColumns = 1;
-                dwRows = 1;
-                dwFrames = 1;
-
                 var resp = Acquisition_Init(ref deviceHandle, HIS_BOARD_TYPE.ELTEC_XRD_FGE_Opto, 0, true, 0, 0, 0, true, true);
                 
                 Trace.WriteLine("Open Device response: " + resp.ToString());
@@ -73,25 +77,20 @@ namespace xraylib
                     return false;
                 }
 
+                state = State.OPEN;
 
-                // Docs say we can just ask the device for this info.
-                Acquisition_GetConfiguration(ref deviceHandle, ref dwFrames, ref dwRows, ref dwColumns, ref dwDataType, ref dwSortFlags, ref irqEnabled, ref acqType, ref systemId, ref syncMode, ref hwAccess);
-               Trace.WriteLine("GetConfiguration Device response: " + resp.ToString());
+                SetFOVMode(fov);
+                SetBinningMode(binning);
+                SetGainMode(gain);
 
-                dwColumns = 1;
-                dwRows = 1;
+                resp = GetConfiguration();
+
+
                 dwFrames = 1;
 
-                // Get valid integration times
-                Acquisition_GetIntTimes(ref deviceHandle, ref intTime, ref nIntTimes);
-                Trace.WriteLine("GetIntTimes Device response: " + resp.ToString());
+                resp = SetBuffer();
 
-                foreach(var time in intTime)
-                    Trace.WriteLine("intTime: " + time);
-
-
-                if (resp == HIS_RETURN.HIS_ALL_OK)
-                    state = State.OPEN;
+                //resp = CreatePixelMap();
 
                 return resp == HIS_RETURN.HIS_ALL_OK;
 
@@ -103,16 +102,65 @@ namespace xraylib
             return false;
         }
 
-        public HIS_RETURN SetBinningMode(DETECTOR_BINNING mode)
+        private HIS_RETURN GetConfiguration()
         {
-            if(state != State.OPEN)
-                throw new InvalidOperationException("Can't set binning mode before opening");
+            // Docs say we can just ask the device for this info.
+            var resp = Acquisition_GetConfiguration(deviceHandle, ref dwFrames, ref dwRows, ref dwColumns, ref dwDataType, ref dwSortFlags, ref irqEnabled, ref acqType, ref systemId, ref syncMode, ref hwAccess);
+            Trace.WriteLine("GetConfiguration Device response: " + resp.ToString());
+
+            if(resp == HIS_RETURN.HIS_ALL_OK)
+                configGood = true;
+
+            return resp;
+        }
+
+        public HIS_RETURN SetBinningMode(XRD4343_Binning mode)
+        {
+            configGood = false;
+            binning = mode;
+
+            if (state != State.OPEN)
+                return HIS_RETURN.HIS_ERROR_NOT_INITIALIZED;
 
 
-            var resp = Acquisition_SetCameraBinningMode(ref deviceHandle, mode);
+            var resp = Acquisition_SetCameraBinningMode(deviceHandle, mode);
             Trace.WriteLine("SetCameraBinningMode Device response: " + resp.ToString());
 
             return resp;
+        }
+
+        public HIS_RETURN SetFOVMode(XRD4343_FOV mode)
+        {
+            configGood = false;
+            fov = mode;
+
+            if (state != State.OPEN)
+                return HIS_RETURN.HIS_ERROR_NOT_INITIALIZED;
+
+
+            var resp = Acquisition_SetCameraFOVMode(deviceHandle, mode);
+            Trace.WriteLine("SetCameraFOVMode Device response: " + resp.ToString());
+
+            return resp;
+        }
+
+        public HIS_RETURN SetGainMode(XRD4343_Gain mode)
+        {
+            gain = mode;
+            if (state != State.OPEN)
+                return HIS_RETURN.HIS_ERROR_NOT_INITIALIZED;
+
+
+            var resp = Acquisition_SetCameraGain(deviceHandle, mode);
+            Trace.WriteLine("SetCameraGain Device response: " + resp.ToString());
+
+            return resp;
+        }
+
+        public void SetFrameCount(uint frameCount)
+        {
+            bufferGood = false;
+            dwFrames = frameCount;
         }
 
         private bool CheckBuffer()
@@ -136,7 +184,36 @@ namespace xraylib
                 bufferGood = true;
             }
 
-            var resp = Acquisition_DefineDestBuffers(ref deviceHandle, ref imageBuffer, dwFrames, dwRows, dwColumns);
+            var resp = Acquisition_DefineDestBuffers(deviceHandle, ref imageBuffer, dwFrames, dwRows, dwColumns);
+
+            return resp;
+        }
+
+        public HIS_RETURN CreatePixelMap()
+        {
+            if (!configGood)
+                GetConfiguration();
+
+            if (!CheckBuffer())
+            {
+                Trace.WriteLine("Buffer not good and we're in CreatePixelMap, calling SetBuffer");
+                Trace.WriteLine("SetBuffer Device response: " + SetBuffer());
+            }
+
+            corrList = null;
+            corrListSize = 0;
+            var resp = Acquisition_CreatePixelMap(ref imageBuffer, dwRows, dwColumns, ref corrList, ref corrListSize);
+
+            Trace.WriteLine("First call to Acquisition_CreatePixelMap Device response: " + resp.ToString());
+
+            if (resp == HIS_RETURN.HIS_ALL_OK && corrListSize > 0)
+            {
+                corrList = new uint[corrListSize];
+
+                resp = Acquisition_CreatePixelMap(ref imageBuffer, dwRows, dwColumns, ref corrList, ref corrListSize);
+                Trace.WriteLine("Second call to Acquisition_CreatePixelMap Device response: " + resp.ToString());
+            }
+            
 
             return resp;
         }
@@ -146,8 +223,13 @@ namespace xraylib
             if (state != State.OPEN)
                 throw new InvalidOperationException("Can't acquire before opening");
 
-            ushort[] nullshort = null;
-            uint[] nulluint = null;
+            if (!configGood)
+                GetConfiguration();
+
+            ushort[] offsetArr = new ushort[dwColumns * dwRows];
+            uint[] gainArr = new uint[dwColumns * dwRows];
+            
+            CreatePixelMap();
 
             if (!CheckBuffer())
             {
@@ -155,7 +237,7 @@ namespace xraylib
                 Trace.WriteLine("SetBuffer Device response: " + SetBuffer());
             }
 
-            var resp = Acquisition_Acquire_Image(ref deviceHandle, 1, 0, HIS_SEQ.AVERAGE, ref nullshort, ref nulluint, ref nulluint);
+            var resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, ref offsetArr, ref gainArr, ref corrList);
             Trace.WriteLine("Acquisition_Acquire_Image Device response: " + resp.ToString());
 
             return resp;
