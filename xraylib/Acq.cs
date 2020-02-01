@@ -970,10 +970,10 @@ namespace xraylib
         public static extern HIS_RETURN Acquisition_GetCommChannel(IntPtr pAcqDesc, ref uint pdwChannelType, ref int pnChannelNr);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_DefineDestBuffers(IntPtr pAcqDesc, ref ushort[] pProcessedData, uint nFrames, uint nRows, uint nColumns);
+        public static extern HIS_RETURN Acquisition_DefineDestBuffers(IntPtr pAcqDesc, IntPtr pProcessedData, uint nFrames, uint nRows, uint nColumns);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, ref ushort[] pwOffsetData, ref uint[] pdwGainData, ref uint[] pdwPxlCorrList);
+        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, [In, Out] ushort[] pwOffsetData, [In, Out] uint[] pdwGainData, [In, Out] uint[] pdwPxlCorrList);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_Acquire_Image_Ex(IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt,
@@ -1004,8 +1004,8 @@ namespace xraylib
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_CreateGainMap(ref ushort pGainData, ref ushort pGainAVG, int nCount, int nFrame);
 
-        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_CreatePixelMap(ref ushort[] pData, uint nDataRows, uint nDataColumns, ref uint[] pCorrList, ref uint nCorrListSize);
+        [DllImport("XISL.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern HIS_RETURN Acquisition_CreatePixelMap([In, Out] ushort[] pData, uint nDataRows, uint nDataColumns, [In, Out] int[] pCorrList, ref uint nCorrListSize);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoOffsetCorrection(ushort* pSource, ushort* pDest, ushort* pOffsetData, int nCount);

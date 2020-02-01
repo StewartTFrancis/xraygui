@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,6 +103,14 @@ namespace xraygui
 			acquire.SetImageCount((int)numAcqCount.Value);
 
 			acquire.AcquireImage();
+
+			using (var fs = File.Create("image.dat"))
+			{
+				System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+				formatter.Serialize(fs, acquire.imageBuffer);
+			}
+			
+			
 		}
 
 		private void btnCTAcq_Click(object sender, EventArgs e)
@@ -183,5 +193,29 @@ namespace xraygui
 			closeDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.OPEN;
 		}
 
+		private void testToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+
+			ushort[] imagedata = null;
+
+			using (var fs = File.OpenRead("image.dat"))
+				imagedata = (ushort[])bf.Deserialize(fs);
+
+			byte[] bytes = new byte[imagedata.Length * 2];
+
+			Buffer.BlockCopy(imagedata, 0, bytes, 0, bytes.Length);
+
+
+			var image = AForge.Imaging.UnmanagedImage.Create(2880, 2880, System.Drawing.Imaging.PixelFormat.Format16bppGrayScale);
+
+			var ptr = image.ImageData;
+
+			Marshal.Copy(bytes, 0, ptr, 2880 * 2880 * 2);
+
+			pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+
+			pictureBox1.Image = image.ToManagedImage();
+		}
 	}
 }
