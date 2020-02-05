@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Zaber.Motion.Binary;
 
 namespace xraylib
@@ -18,41 +20,28 @@ namespace xraylib
         Connection conn;
         Device dev;
 
-        double currPos = 0;
-        public MotionController()
-        {
+        private double _currAngle;
+        public double CurrentAngle { get
+            {
+                return _currAngle;
+            }
+
+            private set
+            {
+                if (value != _currAngle)
+                {
+                    _currAngle = value;
+                    if (AngleChanged != null)
+                        AngleChanged.Invoke(this, value);
+                }
+            }
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        public delegate void AngleChangedHandler(object sender, double newAngle);
+        public event AngleChangedHandler AngleChanged;
 
-        public double CurrentAngle { get { return currPos; } }
-
-        protected virtual void Dispose(bool disposing)
+        public MotionController()
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                }
-
-                try
-                {
-                    if (conn != null)
-                        conn.Dispose();
-
-                }
-                catch (Exception ex)
-                {
-                    ex.Trace();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
         }
 
         public bool OpenDevice()
@@ -62,7 +51,7 @@ namespace xraylib
                 conn = Connection.OpenSerialPort("COM1");
                 dev = conn.DetectDevices()[0];
 
-                currPos = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
+                CurrentAngle = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
             }
             catch (Exception ex)
             {
@@ -118,7 +107,7 @@ namespace xraylib
                 return false;
             }
 
-            currPos = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
+            this.CurrentAngle = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
 
             return true;
         }
@@ -130,7 +119,7 @@ namespace xraylib
             try
             {
                 dev.Home();
-                currPos = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
+                this.CurrentAngle = dev.GetPosition(Zaber.Motion.Units.Angle_Degrees);
             }
             catch (Exception ex)
             {
@@ -139,6 +128,35 @@ namespace xraylib
             }
 
             return true;
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                try
+                {
+                    if (conn != null)
+                        conn.Dispose();
+
+                }
+                catch (Exception ex)
+                {
+                    ex.Trace();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.

@@ -51,6 +51,7 @@
             this.cbGain = new System.Windows.Forms.ComboBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.btnAcquireOnly = new System.Windows.Forms.Button();
             this.btnAcq = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.numAcqCount = new System.Windows.Forms.NumericUpDown();
@@ -75,16 +76,15 @@
             this.cbMoveType = new System.Windows.Forms.ComboBox();
             this.label17 = new System.Windows.Forms.Label();
             this.panel7 = new System.Windows.Forms.Panel();
-            this.trackBar2 = new System.Windows.Forms.TrackBar();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.sLevel = new System.Windows.Forms.TrackBar();
+            this.sWindow = new System.Windows.Forms.TrackBar();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.openDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tmrCurrAngle = new System.Windows.Forms.Timer(this.components);
-            this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new AForge.Controls.PictureBox();
+            this.tmrPollAngle = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -98,8 +98,8 @@
             this.panel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMoveTo)).BeginInit();
             this.panel7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sLevel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sWindow)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -109,9 +109,9 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblStatus,
             this.tblblCurrAngle});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 500);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 602);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1139, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1163, 22);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -155,7 +155,7 @@
             this.panel2.Controls.Add(this.cbGain);
             this.panel2.Location = new System.Drawing.Point(0, 72);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(205, 288);
+            this.panel2.Size = new System.Drawing.Size(205, 230);
             this.panel2.TabIndex = 4;
             // 
             // label8
@@ -170,10 +170,15 @@
             // cbPixelCorr
             // 
             this.cbPixelCorr.FormattingEnabled = true;
+            this.cbPixelCorr.Items.AddRange(new object[] {
+            "None",
+            "Acquire New",
+            "Pull From File"});
             this.cbPixelCorr.Location = new System.Drawing.Point(76, 194);
             this.cbPixelCorr.Name = "cbPixelCorr";
             this.cbPixelCorr.Size = new System.Drawing.Size(121, 21);
             this.cbPixelCorr.TabIndex = 13;
+            this.cbPixelCorr.SelectedIndexChanged += new System.EventHandler(this.cbPixelCorr_SelectedIndexChanged);
             // 
             // label7
             // 
@@ -187,10 +192,15 @@
             // cbGainImage
             // 
             this.cbGainImage.FormattingEnabled = true;
+            this.cbGainImage.Items.AddRange(new object[] {
+            "None",
+            "Acquire New",
+            "Pull From File"});
             this.cbGainImage.Location = new System.Drawing.Point(76, 167);
             this.cbGainImage.Name = "cbGainImage";
             this.cbGainImage.Size = new System.Drawing.Size(121, 21);
             this.cbGainImage.TabIndex = 11;
+            this.cbGainImage.SelectedIndexChanged += new System.EventHandler(this.cbGainImage_SelectedIndexChanged);
             // 
             // label6
             // 
@@ -204,10 +214,15 @@
             // cbOffset
             // 
             this.cbOffset.FormattingEnabled = true;
+            this.cbOffset.Items.AddRange(new object[] {
+            "None",
+            "Acquire New",
+            "Pull From File"});
             this.cbOffset.Location = new System.Drawing.Point(76, 140);
             this.cbOffset.Name = "cbOffset";
             this.cbOffset.Size = new System.Drawing.Size(121, 21);
             this.cbOffset.TabIndex = 9;
+            this.cbOffset.SelectedIndexChanged += new System.EventHandler(this.cbOffset_SelectedIndexChanged);
             // 
             // label5
             // 
@@ -257,10 +272,20 @@
             // cbIntegration
             // 
             this.cbIntegration.FormattingEnabled = true;
+            this.cbIntegration.Items.AddRange(new object[] {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"});
             this.cbIntegration.Location = new System.Drawing.Point(76, 59);
             this.cbIntegration.Name = "cbIntegration";
             this.cbIntegration.Size = new System.Drawing.Size(121, 21);
             this.cbIntegration.TabIndex = 3;
+            this.cbIntegration.SelectedIndexChanged += new System.EventHandler(this.cbIntegration_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -294,14 +319,15 @@
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Location = new System.Drawing.Point(0, 359);
+            this.panel3.Location = new System.Drawing.Point(0, 302);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(205, 138);
+            this.panel3.Size = new System.Drawing.Size(205, 297);
             this.panel3.TabIndex = 5;
             // 
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.btnAcquireOnly);
             this.panel4.Controls.Add(this.btnAcq);
             this.panel4.Controls.Add(this.label9);
             this.panel4.Controls.Add(this.numAcqCount);
@@ -310,6 +336,17 @@
             this.panel4.Size = new System.Drawing.Size(238, 103);
             this.panel4.TabIndex = 5;
             // 
+            // btnAcquireOnly
+            // 
+            this.btnAcquireOnly.Enabled = false;
+            this.btnAcquireOnly.Location = new System.Drawing.Point(9, 69);
+            this.btnAcquireOnly.Name = "btnAcquireOnly";
+            this.btnAcquireOnly.Size = new System.Drawing.Size(75, 23);
+            this.btnAcquireOnly.TabIndex = 17;
+            this.btnAcquireOnly.Text = "Acquire Only";
+            this.btnAcquireOnly.UseVisualStyleBackColor = true;
+            this.btnAcquireOnly.Click += new System.EventHandler(this.button1_Click);
+            // 
             // btnAcq
             // 
             this.btnAcq.Enabled = false;
@@ -317,7 +354,7 @@
             this.btnAcq.Name = "btnAcq";
             this.btnAcq.Size = new System.Drawing.Size(75, 23);
             this.btnAcq.TabIndex = 16;
-            this.btnAcq.Text = "Acquire";
+            this.btnAcq.Text = "Save To File";
             this.btnAcq.UseVisualStyleBackColor = true;
             this.btnAcq.Click += new System.EventHandler(this.btnAcq_Click);
             // 
@@ -546,7 +583,7 @@
             this.panel6.Controls.Add(this.label17);
             this.panel6.Location = new System.Drawing.Point(828, 27);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(311, 103);
+            this.panel6.Size = new System.Drawing.Size(335, 103);
             this.panel6.TabIndex = 7;
             // 
             // btnHome
@@ -637,28 +674,36 @@
             this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel7.Controls.Add(this.trackBar2);
-            this.panel7.Controls.Add(this.trackBar1);
+            this.panel7.Controls.Add(this.sLevel);
+            this.panel7.Controls.Add(this.sWindow);
             this.panel7.Controls.Add(this.label11);
             this.panel7.Controls.Add(this.label10);
             this.panel7.Location = new System.Drawing.Point(204, 129);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(935, 46);
+            this.panel7.Size = new System.Drawing.Size(959, 46);
             this.panel7.TabIndex = 6;
             // 
-            // trackBar2
+            // sLevel
             // 
-            this.trackBar2.Location = new System.Drawing.Point(482, 2);
-            this.trackBar2.Name = "trackBar2";
-            this.trackBar2.Size = new System.Drawing.Size(288, 45);
-            this.trackBar2.TabIndex = 20;
+            this.sLevel.Location = new System.Drawing.Point(482, 2);
+            this.sLevel.Maximum = 65536;
+            this.sLevel.Minimum = 1;
+            this.sLevel.Name = "sLevel";
+            this.sLevel.Size = new System.Drawing.Size(288, 45);
+            this.sLevel.TabIndex = 20;
+            this.sLevel.Value = 32768;
+            this.sLevel.Scroll += new System.EventHandler(this.windowLevelChange);
             // 
-            // trackBar1
+            // sWindow
             // 
-            this.trackBar1.Location = new System.Drawing.Point(68, -1);
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(288, 45);
-            this.trackBar1.TabIndex = 19;
+            this.sWindow.Location = new System.Drawing.Point(68, -1);
+            this.sWindow.Maximum = 32768;
+            this.sWindow.Minimum = 1;
+            this.sWindow.Name = "sWindow";
+            this.sWindow.Size = new System.Drawing.Size(288, 45);
+            this.sWindow.TabIndex = 19;
+            this.sWindow.Value = 16384;
+            this.sWindow.Scroll += new System.EventHandler(this.windowLevelChange);
             // 
             // label11
             // 
@@ -682,11 +727,10 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openDeviceToolStripMenuItem,
-            this.closeDeviceToolStripMenuItem,
-            this.testToolStripMenuItem});
+            this.closeDeviceToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1139, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1163, 24);
             this.menuStrip1.TabIndex = 8;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -705,36 +749,29 @@
             this.closeDeviceToolStripMenuItem.Visible = false;
             this.closeDeviceToolStripMenuItem.Click += new System.EventHandler(this.closeDeviceToolStripMenuItem_Click);
             // 
-            // tmrCurrAngle
-            // 
-            this.tmrCurrAngle.Enabled = true;
-            this.tmrCurrAngle.Tick += new System.EventHandler(this.tmrCurrAngle_Tick);
-            // 
-            // testToolStripMenuItem
-            // 
-            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
-            this.testToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.testToolStripMenuItem.Text = "Test";
-            this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
-            // 
             // pictureBox1
             // 
             this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1.Image = null;
-            this.pictureBox1.Location = new System.Drawing.Point(204, 171);
+            this.pictureBox1.Location = new System.Drawing.Point(205, 176);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(934, 303);
+            this.pictureBox1.Size = new System.Drawing.Size(958, 420);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox1.TabIndex = 9;
             this.pictureBox1.TabStop = false;
+            // 
+            // tmrPollAngle
+            // 
+            this.tmrPollAngle.Enabled = true;
+            this.tmrPollAngle.Tick += new System.EventHandler(this.tmrPollAngle_Tick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1139, 522);
+            this.ClientSize = new System.Drawing.Size(1163, 624);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.panel7);
             this.Controls.Add(this.panel6);
@@ -748,6 +785,7 @@
             this.Name = "Form1";
             this.Text = "XRayGui";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -767,8 +805,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMoveTo)).EndInit();
             this.panel7.ResumeLayout(false);
             this.panel7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sLevel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sWindow)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -814,8 +852,8 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.TrackBar trackBar2;
-        private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.TrackBar sLevel;
+        private System.Windows.Forms.TrackBar sWindow;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.NumericUpDown numAngleIncr;
@@ -830,10 +868,10 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem openDeviceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeDeviceToolStripMenuItem;
-        private System.Windows.Forms.Timer tmrCurrAngle;
         private System.Windows.Forms.NumericUpDown numCtCount;
-        private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private AForge.Controls.PictureBox pictureBox1;
+        private System.Windows.Forms.Timer tmrPollAngle;
+        private System.Windows.Forms.Button btnAcquireOnly;
     }
 }
 

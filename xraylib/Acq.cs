@@ -870,95 +870,23 @@ namespace xraylib
         *
 */
 
-        #region "Pick up here"
-//        struct networkAdapterConfiguration
-//        {
-//            int enabled;        //!< Enabled flag, this is not changeable for LAN by API, but changeable for WLAN
-//            int hw_accel;       //!< Used image transfer, this is not changeable by API
-//            int bridged;        //!< Is the device in a bridge, this is not changeable by API
-
-//            char ifname[16];    //!< Interface name (eth0), this is not changeable by API
-//            char ipaddr[16];    //!< IP address
-//            char netmask[16];   //!< Netmask
-//            char proto[16];     //!< "static" or "dhcp", only these two options are available
-//            char dns[16];       //!< DNS server
-//            char gateway[16];   //!< Gateway
-//            char macaddr[18];   //!< MAC address, this is not changeable by API
-
-//            char not_used[110]; //!< To fill up the struct to 320 byte
-//        };
-
-
-//        /**
-//        * Wifi configurations
-//*/
-//        struct wifiConfiguration
-//        {
-//            char mode[32];      //!< Accesspoint or client
-//            char agmode[32];    //!< agmode
-//            int channel;        //!< Channel
-
-//            char ssid[64];          //!< Own SSID if mode == "ap" or the accesspoints ssid
-//            char description[64];   //!< Contains the description in case of a station
-//        };
-
-
-//        /**
-//        * Wifi configurations, extended version
-//*/
-//        struct wifiConfigurationEx
-//        {
-//            char mode[32];      //!< Accesspoint or client
-//            char agmode[32];    //!< agmode
-//            int channel;        //!< Channel, only valid options will be accepted, otherwise will return with error
-
-//            char ssid[64];          //!< Own SSID if mode == "ap" or the accesspoints ssid
-//            char description[64];   //!< Contains the description in case of a station
-
-//            char passphrase[68];    //!< new Passphrase (station or accesspoint) (may be 64 byte)
-//            int scan_ssid;          //!< only of station mode: scan the SSID
-//        };
-
-
-
-
-//        /**
-//        * Structure for holding the complete
-//        * network configuration.
-//        *
-//*/
-//        struct networkConfiguration
-//        {
-//            char path[128];         //!< The configurations path, this is not changeable by API
-//            char name[80];          //!< The configuration name
-//            char hostname[80];      //!< The hostname
-//            int readonly;           //!< Is the configuration readonly, this is not changeable by API
-//	int sshd_enabled;       //!< SSH daemon enabled
-
-//            int gbif_enabled;       //!< Is the GBif enabled
-
-//            struct networkAdapterConfiguration lan;     //!< LAN
-//	struct networkAdapterConfiguration wlan;    //!< WLAN
-
-//	struct wifiConfigurationEx wifi; //!< Wifi configuration, extended version
-
-//	char notUsed[184];               //!< For later extensions
-//        }
-//#endif // _DLL_EXPORT
-//        // wpe library includes end
-
-        #endregion
-
+        
         // See: https://stackoverflow.com/questions/5235445/pinvoke-c-function-takes-pointer-to-function-as-argument
 
-        /* [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public extern HIS_RETURN Acquisition_SetCallbacksAndMessages(IntPtr pAcqDesc,
-                      IntPtr hWnd,
-                      uint dwErrorMsg, uint dwLoosingFramesMsg,
-                      void (CALLBACK* lpfnEndFrameCallback)(HACQDESC),
-                      void (CALLBACK* lpfnEndAcqCallback)(HACQDESC) 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void EndFrameCallback(IntPtr pAcqDesc);
+        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void EndAcqCallback(IntPtr pAcqDesc);
 
-                      ); */
+
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern HIS_RETURN Acquisition_SetCallbacksAndMessages(IntPtr pAcqDesc,
+                      HandleRef hWnd,
+                      uint dwErrorMsg, uint dwLoosingFramesMsg,
+                      [MarshalAs(UnmanagedType.FunctionPtr)]EndFrameCallback lpfnEndFrameCallback,
+                      [MarshalAs(UnmanagedType.FunctionPtr)]EndAcqCallback lpfnEndAcqCallback
+                      );
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_EnumSensors(ref uint pdwNumSensors, bool bEnableIRQ, bool bAlwaysOpen);
@@ -968,12 +896,13 @@ namespace xraylib
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_GetCommChannel(IntPtr pAcqDesc, ref uint pdwChannelType, ref int pnChannelNr);
-
+        
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_DefineDestBuffers(IntPtr pAcqDesc, IntPtr pProcessedData, uint nFrames, uint nRows, uint nColumns);
+        
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, [In, Out] ushort[] pwOffsetData, [In, Out] uint[] pdwGainData, [In, Out] uint[] pdwPxlCorrList);
+        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, [In] ushort[] pwOffsetData, [In] uint[] pdwGainData, [In] int[] pdwPxlCorrList);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_Acquire_Image_Ex(IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt,
@@ -990,22 +919,21 @@ namespace xraylib
         public static extern HIS_RETURN Acquisition_SetCameraMode(IntPtr hAcqDesc, uint dwMode);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage(IntPtr hAcqDesc, ref ushort pOffsetData, uint nRows, uint nCols, uint nFrames);
+        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage(IntPtr hAcqDesc, IntPtr pOffsetData, uint nRows, uint nCols, uint nFrames);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage_Ex(IntPtr hAcqDesc, ref ushort pOffsetData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
+        public static extern HIS_RETURN Acquisition_Acquire_OffsetImage_Ex(IntPtr hAcqDesc, IntPtr pOffsetData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_GainImage(IntPtr hAcqDesc, ref ushort pOffsetData, ref ushort pGainData, uint nRows, uint nCols, uint nFrames);
+        public static extern HIS_RETURN Acquisition_Acquire_GainImage(IntPtr hAcqDesc, IntPtr pOffsetData, IntPtr pGainData, uint nRows, uint nCols, uint nFrames);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex(IntPtr hAcqDesc, ref ushort pOffsetData, ref uint pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
+        public static extern HIS_RETURN Acquisition_Acquire_GainImage_Ex(IntPtr hAcqDesc, IntPtr pOffsetData, IntPtr pGainData, uint nRows, uint nCols, uint nFrames, uint dwOpt);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_CreateGainMap(ref ushort pGainData, ref ushort pGainAVG, int nCount, int nFrame);
-
-        [DllImport("XISL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern HIS_RETURN Acquisition_CreatePixelMap([In, Out] ushort[] pData, uint nDataRows, uint nDataColumns, [In, Out] int[] pCorrList, ref uint nCorrListSize);
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_CreatePixelMap([In] uint[] pData, uint nDataRows, uint nDataColumns, [In, Out] int[] pCorrList, ref uint nCorrListSize);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoOffsetCorrection(ushort* pSource, ushort* pDest, ushort* pOffsetData, int nCount);
@@ -1040,16 +968,16 @@ namespace xraylib
         public static extern HIS_RETURN Acquisition_IsAcquiringData(IntPtr hAcqDesc);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-                public static extern HIS_RETURN Acquisition_Close(IntPtr hAcqDesc);
+        public static extern HIS_RETURN Acquisition_Close(IntPtr hAcqDesc);
 
-                [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-                public static extern HIS_RETURN Acquisition_CloseAll();
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_CloseAll();
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_SetReady(IntPtr hAcqDesc, bool bFlag);
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_SetReady(IntPtr hAcqDesc, bool ready);
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_GetReady(IntPtr hAcqDesc);
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_GetReady(IntPtr hAcqDesc);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_GetErrorCode(IntPtr hAcqDesc, uint* dwHISError, uint* dwBoardError);

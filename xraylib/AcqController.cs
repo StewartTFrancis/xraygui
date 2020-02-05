@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using static xraylib.Acq;
 
 namespace xraylib
@@ -13,9 +15,11 @@ namespace xraylib
         
         IntPtr deviceHandle;
         GCHandle bufferHandle;
+        GCHandle offsetHandle;
+        GCHandle gainHandle;
 
 
-        public ushort[] imageBuffer = null;
+        public uint[] imageBuffer = null;
 
         uint dwFrames = 0;
         public uint dwRows = 0;
@@ -27,6 +31,9 @@ namespace xraylib
         ulong systemId = 0;
         ulong syncMode = 0;
         ulong hwAccess = 0;
+        public int imageBufferSize { get; private set; }
+
+        HandleRef hwnd;
 
         double[] intTime = new double[12];
         int nIntTimes = 12;
@@ -35,7 +42,15 @@ namespace xraylib
         bool configGood = false;
 
         uint corrListSize = 0;
-        uint[] corrList = null;
+        public int[] corrList = null;
+
+        public ushort[] offsetArr = null;
+        public uint[] gainArr = null;
+
+        public delegate void ImageAcquired();
+        public event ImageAcquired imageAcquired;
+
+        private event ImageAcquired internalImageAcquired;
 
         public enum State
         {
@@ -62,8 +77,43 @@ namespace xraylib
             return SetBuffer() == HIS_RETURN.HIS_ALL_OK;
         }
 
-        public bool OpenDevice()
+        private void FrameAcquired(IntPtr dev)
         {
+            Trace.WriteLine("FrameAcquired Called.");
+            Acquisition_SetReady(dev, true);
+        }
+
+        private void AcqDone(IntPtr dev)
+        {
+            Trace.WriteLine("AcqDone Called.");
+
+            if (imageAcquired != null)
+                imageAcquired();
+
+            Acquisition_SetReady(dev, true);
+        }
+
+        private void InternalFrameAcquired(IntPtr dev)
+        {
+            Trace.WriteLine("InternalFrameAcquired Called.");
+            Acquisition_SetReady(dev, true);
+        }
+
+        private void InternalAcqDone(IntPtr dev)
+        {
+            Trace.WriteLine("InternalAcqDone Called.");
+            
+            if(internalImageAcquired != null)
+                internalImageAcquired();
+
+            Acquisition_SetReady(dev, true);
+        }
+
+        public bool OpenDevice(IntPtr windowHandle)
+        {
+            if (windowHandle != null && windowHandle != IntPtr.Zero)
+                hwnd = new HandleRef(this, windowHandle);
+
             if (state != State.CLOSED)
                 throw new InvalidOperationException("Can't open if we aren't closed.");
             
@@ -82,13 +132,14 @@ namespace xraylib
 
                 state = State.OPEN;
 
+                Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, FrameAcquired, AcqDone);
+
                 SetFOVMode(fov);
                 SetBinningMode(binning);
                 SetGainMode(gain);
                 SetCameraMode(7);
 
                 resp = GetConfiguration();
-
 
                 dwFrames = 1;
 
@@ -116,6 +167,90 @@ namespace xraylib
                 configGood = true;
 
             return resp;
+        }
+
+        public uint[] GetGainImage()
+        {
+            try
+            {
+                if (gainHandle != null && gainHandle.IsAllocated)
+                    gainHandle.Free();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine("Failed to free offsetHandle!");
+                ex.Trace();
+            }
+
+            gainArr = new uint[this.imageBufferSize];
+            gainHandle = GCHandle.Alloc(offsetArr, GCHandleType.Pinned);
+
+            var keepWaiting = true;
+
+            internalImageAcquired = () => { Trace.WriteLine("Gain image returned");  keepWaiting = false;  };
+
+            Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, InternalFrameAcquired, InternalAcqDone);
+            var resp = Acquisition_Acquire_GainImage(deviceHandle, offsetHandle.AddrOfPinnedObject(), gainHandle.AddrOfPinnedObject(), dwRows, dwColumns, dwFrames);
+            Trace.WriteLine("Acquisition_Acquire_GainImage: " + resp);
+
+            if (resp == HIS_RETURN.HIS_ALL_OK)
+            {
+                for (var i = 0; i < 30; i++)
+                {
+                    if (keepWaiting)
+                        Task.WaitAll(Task.Delay(100));
+                    else
+                        return gainArr;
+                }
+            }
+
+            return gainArr;
+        }
+
+        public ushort[] GetOffsetImage()
+        {
+            try
+            {
+                if (offsetHandle != null && offsetHandle.IsAllocated)
+                    offsetHandle.Free();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine("Failed to free offsetHandle!");
+                ex.Trace();
+            }
+
+            offsetArr = new ushort[this.imageBufferSize];
+
+            offsetHandle = GCHandle.Alloc(offsetArr, GCHandleType.Pinned);
+            
+            var keepWaiting = true;
+            internalImageAcquired = () => { Trace.WriteLine("Offset image returned");  keepWaiting = false; };
+            Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, InternalFrameAcquired, InternalAcqDone);
+
+            var resp = Acquisition_Acquire_OffsetImage(deviceHandle, offsetHandle.AddrOfPinnedObject(), dwRows, dwColumns, dwFrames);
+            Trace.WriteLine("Acquisition_Acquire_OffsetImage: " + resp);
+
+            if (resp == HIS_RETURN.HIS_ALL_OK)
+            {
+                for (var i = 0; i < 30; i++)
+                {
+                    if (keepWaiting)
+                        Task.WaitAll(Task.Delay(100));
+                    else
+                        return offsetArr;
+                }
+            }
+
+            return offsetArr;
+        }
+
+        public int[] GetPixelCorrection()
+        {
+            var resp = CreatePixelMap();
+            Trace.WriteLine("Called CreatePixelmap: " + resp);
+
+            return corrList;
         }
 
         public HIS_RETURN SetCameraMode(uint mode)
@@ -175,7 +310,6 @@ namespace xraylib
 
         private bool CheckBuffer()
         {
-            var buffSize = dwFrames * dwRows * dwColumns * 2;
             if (!bufferGood || imageBuffer.Length != dwFrames * dwRows * dwColumns * 2)
             {
                 Trace.WriteLine("Buffer bad.");
@@ -195,6 +329,9 @@ namespace xraylib
 
             if (!CheckBuffer())
             {
+                // For consuming app, single image buffer size is:
+                imageBufferSize = (int)(dwRows * dwColumns * 2);
+
                 try
                 {
                     if (bufferHandle != null && bufferHandle.IsAllocated)
@@ -206,7 +343,8 @@ namespace xraylib
                 }
                 
                 var buffSize = dwFrames * dwRows * dwColumns * 2;
-                imageBuffer = new ushort[buffSize];
+                
+                imageBuffer = new uint[buffSize];
 
                 bufferHandle = GCHandle.Alloc(imageBuffer, GCHandleType.Pinned);
                 
@@ -216,7 +354,6 @@ namespace xraylib
 
                 if (resp == HIS_RETURN.HIS_ALL_OK)
                     bufferGood = true;
-
             }
 
             return resp;
@@ -233,19 +370,19 @@ namespace xraylib
                 Trace.WriteLine("SetBuffer Device response: " + SetBuffer());
             }
 
-            int[] ourcorrList = null;
+            
             corrListSize = 0;
-            var dummyPtr = IntPtr.Zero;
-            var resp = Acquisition_CreatePixelMap(imageBuffer, dwRows, dwColumns, ourcorrList, ref corrListSize);
+            var resp = Acquisition_CreatePixelMap(imageBuffer, dwRows, dwColumns, corrList, ref corrListSize);
 
             Trace.WriteLine("First call to Acquisition_CreatePixelMap Device response: " + resp.ToString());
+            Trace.WriteLine("corrListSize: " + corrListSize.ToString());
 
             if (resp == HIS_RETURN.HIS_ALL_OK && corrListSize > 0)
             {
-                corrList = new uint[corrListSize];
+                corrList = new int[corrListSize];
 
-                //resp = Acquisition_CreatePixelMap(ref imageBuffer, dwRows, dwColumns, ref corrList, ref corrListSize);
-                //Trace.WriteLine("Second call to Acquisition_CreatePixelMap Device response: " + resp.ToString());
+                resp = Acquisition_CreatePixelMap(imageBuffer, dwRows, dwColumns, corrList, ref corrListSize);
+                Trace.WriteLine("Second call to Acquisition_CreatePixelMap Device response: " + resp.ToString());
             }
             
 
@@ -254,34 +391,39 @@ namespace xraylib
 
         public HIS_RETURN AcquireImage()
         {
-            if (state != State.OPEN)
-                throw new InvalidOperationException("Can't acquire before opening");
-
-            if (!configGood)
-                GetConfiguration();
-
-            ushort[] offsetArr = null;
-
-
-            uint[] gainArr = null;
-            
-            //CreatePixelMap();
-
-            if (!CheckBuffer())
+            try
             {
-                Trace.WriteLine("Buffer not good and we're in AcquireImage, calling SetBuffer");
-                Trace.WriteLine("SetBuffer Device response: " + SetBuffer());
-            }
-            
-            var dummyPtr1 = IntPtr.Zero;
-            var dummyPtr2 = IntPtr.Zero;
-            var dummyPtr3 = IntPtr.Zero;
-            var resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, offsetArr, gainArr, corrList);
-            Trace.WriteLine("Acquisition_Acquire_Image Device response: " + resp.ToString());
-            
-            System.Threading.Thread.Sleep(3000);
+                if (state != State.OPEN)
+                    throw new InvalidOperationException("Can't acquire before opening");
 
-            return resp;
+                if (!configGood)
+                    GetConfiguration();
+
+                if (!CheckBuffer())
+                {
+                    Trace.WriteLine("Buffer not good and we're in AcquireImage, calling SetBuffer");
+                    Trace.WriteLine("SetBuffer Device response: " + SetBuffer());
+                }
+                else
+                {
+                    Trace.WriteLine("Buffer good in AcquireImage");
+                }
+
+                Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, FrameAcquired, AcqDone);
+
+                corrList = null;
+
+                var resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, offsetArr, gainArr, corrList);
+                Trace.WriteLine("Acquisition_Acquire_Image Device response: " + resp.ToString());
+
+                return resp;
+            } catch (Exception ex)
+            {
+                Trace.WriteLine("Error in AcquireImage");
+                ex.Trace();
+
+                return HIS_RETURN.HIS_ERROR_ACQUISITION;
+            }
         }
 
         public bool CloseDevice()
@@ -297,7 +439,6 @@ namespace xraylib
                 Trace.WriteLine("Close Device response: " + resp.ToString());
 
                 return resp == HIS_RETURN.HIS_ALL_OK;
-
             }
             catch (Exception ex)
             {

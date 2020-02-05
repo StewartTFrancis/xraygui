@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace xraylib
@@ -49,6 +50,13 @@ namespace xraylib
             System.Diagnostics.Trace.WriteLine("\nSource ---\n{0}", ex.Source);
             System.Diagnostics.Trace.WriteLine(
                 "\nStackTrace ---\n{0}", ex.StackTrace);
+            ex.InnerException?.Trace();
+            
+        }
+
+        public static byte[] getBytesFromUint(uint[] data)
+        {
+            return data.SelectMany((val) => BitConverter.GetBytes(val)).ToArray();
         }
 
     }
