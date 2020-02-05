@@ -23,7 +23,7 @@ namespace xraygui
 
 		private Action<byte[]> imageDelegate;
 
-		private uint[] imageData;
+		private ushort[] imageData;
 
 		private DebounceDispatcher debounceWindowLevel = new DebounceDispatcher();
 
@@ -67,17 +67,17 @@ namespace xraygui
 			try
 			{
 				// We're copying the current imageBytes to a new array because as soon as we return the device will continue to aquire the next image.
-				uint[] imageData = new uint[acquire.imageBufferSize];
+				ushort[] imageData = new ushort[acquire.imageBufferSize];
 
 				Buffer.BlockCopy(acquire.imageBuffer, 0, imageData, 0, acquire.imageBufferSize);
 
 				// Wrap this all in a task so we can continue, but do the image correct syncronously before calling update/image delegate.
 				Task.Run(() =>
 				{
-					DoImageRotation(ref imageData);
+					// DoImageRotation(ref imageData);
 					this.imageData = imageData;
 
-					byte[] imageBytes = Helpers.getBytesFromUint(imageData);
+					byte[] imageBytes = Helpers.getBytesFromUshort(imageData);
 
 					Task.Run(() => UpdateImage(imageBytes));
 
@@ -109,12 +109,12 @@ namespace xraygui
 			imageData = newData;
 		}
 
-		private uint[] ApplyWindowLevel(uint[] imageData)
+		private ushort[] ApplyWindowLevel(ushort[] imageData)
 		{
 			//((pixelData[i] - (wLevel - wWidth / 2)) *255) * wWidth
 			
 			return imageData.Select((pix)=> {
-				return (uint)(((pix - sLevel.Value - sWindow.Value / 2) * uint.MaxValue) * sWindow.Value);
+				return (ushort)(((pix - sLevel.Value - sWindow.Value / 2) * ushort.MaxValue) * sWindow.Value);
 			}).ToArray();
 		}
 
@@ -613,9 +613,9 @@ namespace xraygui
 
 		private void windowLevelChange(object sender, EventArgs e)
 		{
-			//Debounce half a second.
-			debounceWindowLevel.Debounce(500, (obj) => {
-				UpdateImage(Helpers.getBytesFromUint(this.imageData));
+			//Debounce call so we don't flood w/ requests.
+			debounceWindowLevel.Debounce(2000, (obj) => {
+				UpdateImage(Helpers.getBytesFromUshort(ApplyWindowLevel(this.imageData))); 
 			});
 		}
 	}

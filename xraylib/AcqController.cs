@@ -19,7 +19,7 @@ namespace xraylib
         GCHandle gainHandle;
 
 
-        public uint[] imageBuffer = null;
+        public ushort[] imageBuffer = null;
 
         uint dwFrames = 0;
         public uint dwRows = 0;
@@ -344,7 +344,7 @@ namespace xraylib
                 
                 var buffSize = dwFrames * dwRows * dwColumns * 2;
                 
-                imageBuffer = new uint[buffSize];
+                imageBuffer = new ushort[buffSize];
 
                 bufferHandle = GCHandle.Alloc(imageBuffer, GCHandleType.Pinned);
                 

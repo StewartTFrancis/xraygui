@@ -54,7 +54,7 @@ namespace xraylib
             
         }
 
-        public static byte[] getBytesFromUint(uint[] data)
+        public static byte[] getBytesFromUshort(ushort[] data)
         {
             return data.SelectMany((val) => BitConverter.GetBytes(val)).ToArray();
         }

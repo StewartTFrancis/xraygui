@@ -933,7 +933,7 @@ namespace xraylib
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_CreateGainMap(ref ushort pGainData, ref ushort pGainAVG, int nCount, int nFrame);
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        public static extern HIS_RETURN Acquisition_CreatePixelMap([In] uint[] pData, uint nDataRows, uint nDataColumns, [In, Out] int[] pCorrList, ref uint nCorrListSize);
+        public static extern HIS_RETURN Acquisition_CreatePixelMap([In] ushort[] pData, uint nDataRows, uint nDataColumns, [In, Out] int[] pCorrList, ref uint nCorrListSize);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoOffsetCorrection(ushort* pSource, ushort* pDest, ushort* pOffsetData, int nCount);
