@@ -427,6 +427,7 @@
             // 
             // numAngleIncr
             // 
+            this.numAngleIncr.DecimalPlaces = 1;
             this.numAngleIncr.Increment = new decimal(new int[] {
             1,
             0,
@@ -454,6 +455,7 @@
             // 
             // numEndAngle
             // 
+            this.numEndAngle.DecimalPlaces = 1;
             this.numEndAngle.Increment = new decimal(new int[] {
             1,
             0,
@@ -476,6 +478,7 @@
             // 
             // numStartAngle
             // 
+            this.numStartAngle.DecimalPlaces = 1;
             this.numStartAngle.Increment = new decimal(new int[] {
             1,
             0,
@@ -493,6 +496,7 @@
             // 
             // numSettle
             // 
+            this.numSettle.DecimalPlaces = 2;
             this.numSettle.Increment = new decimal(new int[] {
             1,
             0,
