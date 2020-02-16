@@ -42,7 +42,7 @@ namespace xraylib
                     BinaryFormatter bf = new BinaryFormatter();
                     var objIn = bf.Deserialize(fs);
 
-                    if (objIn is CorrImageHelper)
+                    if (objIn is CorrOutStructure)
                         return (CorrOutStructure)objIn;
                     else
                         throw new InvalidDataException("File isn't a correction image.");
@@ -78,6 +78,7 @@ namespace xraylib
         PixelCorrection
     }
 
+    [Serializable]
     public struct CorrOutStructure
     {
         public CorrImageType type { get; set; }

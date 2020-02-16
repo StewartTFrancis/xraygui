@@ -17,8 +17,7 @@ namespace xraylib
         GCHandle bufferHandle;
         GCHandle offsetHandle;
         GCHandle gainHandle;
-
-
+        
         public ushort[] imageBuffer = null;
 
         uint dwFrames = 0;
@@ -32,11 +31,9 @@ namespace xraylib
         ulong syncMode = 0;
         ulong hwAccess = 0;
         public int imageBufferSize { get; private set; }
+        private int buffSize;
 
         HandleRef hwnd;
-
-        double[] intTime = new double[12];
-        int nIntTimes = 12;
 
         bool bufferGood = false;
         bool configGood = false;
@@ -44,13 +41,12 @@ namespace xraylib
         uint corrListSize = 0;
         public int[] corrList = null;
 
-        public ushort[] offsetArr = null;
-        public uint[] gainArr = null;
+        ushort[] offsetArr = null;
+        uint[] gainArr = null;
 
         public delegate void ImageAcquired();
         public event ImageAcquired imageAcquired;
-
-        private event ImageAcquired internalImageAcquired;
+        private event ImageAcquired internalAcqDone;
 
         public enum State
         {
@@ -64,7 +60,8 @@ namespace xraylib
         XRD4343_Gain gain = XRD4343_Gain.eADU_114_default;
 
         public AcqController()
-        {}
+        {
+        }
 
         public bool SetImageCount(int imgCount)
         {
@@ -77,15 +74,36 @@ namespace xraylib
             return SetBuffer() == HIS_RETURN.HIS_ALL_OK;
         }
 
+        public void SetGainArr(uint[] gainArr)
+        {
+            this.gainArr = gainArr;
+            allocGainImage();
+        }
+
+        public void SetOffsetArr(ushort[] offsetArr)
+        {
+            this.offsetArr = offsetArr;
+            allocOffsetImage();
+        }
+
         private void FrameAcquired(IntPtr dev)
         {
             Trace.WriteLine("FrameAcquired Called.");
+
+            if (CheckOffset() && CheckGain())
+            {
+                Trace.WriteLine("Calling DoOffSetGainCorrection.");
+                Trace.WriteLine("DoOffSetGainCorrection: " + Acquisition_DoOffsetGainCorrection(bufferHandle.AddrOfPinnedObject(), bufferHandle.AddrOfPinnedObject(), offsetHandle.AddrOfPinnedObject(), gainHandle.AddrOfPinnedObject(), (int)(dwColumns * dwRows)));
+            }
+
             Acquisition_SetReady(dev, true);
         }
 
         private void AcqDone(IntPtr dev)
         {
             Trace.WriteLine("AcqDone Called.");
+
+            imageBuffer = (ushort[])bufferHandle.Target;
 
             if (imageAcquired != null)
                 imageAcquired();
@@ -103,8 +121,8 @@ namespace xraylib
         {
             Trace.WriteLine("InternalAcqDone Called.");
             
-            if(internalImageAcquired != null)
-                internalImageAcquired();
+            if(internalAcqDone != null)
+                internalAcqDone();
 
             Acquisition_SetReady(dev, true);
         }
@@ -116,7 +134,8 @@ namespace xraylib
 
             if (state != State.CLOSED)
                 throw new InvalidOperationException("Can't open if we aren't closed.");
-            
+
+
             try
             {
                 deviceHandle = IntPtr.Zero;
@@ -132,6 +151,7 @@ namespace xraylib
 
                 state = State.OPEN;
 
+                
                 Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, FrameAcquired, AcqDone);
 
                 SetFOVMode(fov);
@@ -141,11 +161,10 @@ namespace xraylib
 
                 resp = GetConfiguration();
 
-                dwFrames = 1;
-
                 resp = SetBuffer();
-
-                // resp = CreatePixelMap();
+                
+                allocOffsetImage();
+                allocGainImage();
 
                 return resp == HIS_RETURN.HIS_ALL_OK;
 
@@ -163,13 +182,21 @@ namespace xraylib
             var resp = Acquisition_GetConfiguration(deviceHandle, ref dwFrames, ref dwRows, ref dwColumns, ref dwDataType, ref dwSortFlags, ref irqEnabled, ref acqType, ref systemId, ref syncMode, ref hwAccess);
             Trace.WriteLine("GetConfiguration Device response: " + resp.ToString());
 
-            if(resp == HIS_RETURN.HIS_ALL_OK)
+            Trace.WriteLine("We got back:");
+            Trace.WriteLine("dwFrames: " + dwFrames);
+            Trace.WriteLine("dwRows: " + dwRows);
+            Trace.WriteLine("dwColumns: " + dwColumns);
+
+            // Doesn't matter what this says, don't let frames ever be less than 1
+            dwFrames = dwFrames > 0 ? dwFrames : 1;
+
+            if (resp == HIS_RETURN.HIS_ALL_OK)
                 configGood = true;
 
             return resp;
         }
 
-        public uint[] GetGainImage()
+        private void allocGainImage()
         {
             try
             {
@@ -178,24 +205,34 @@ namespace xraylib
             }
             catch (Exception ex)
             {
-                Trace.WriteLine("Failed to free offsetHandle!");
+                Trace.WriteLine("Failed to free gain handle!");
                 ex.Trace();
             }
 
+            if (gainArr != null)
+                gainHandle = GCHandle.Alloc(offsetArr, GCHandleType.Pinned);
+            else
+            { Trace.WriteLine("WARN: In allocGainImage, but gainArr is null"); }
+        }
+
+        public uint[] GetGainImage()
+        {
             gainArr = new uint[this.imageBufferSize];
-            gainHandle = GCHandle.Alloc(offsetArr, GCHandleType.Pinned);
+            allocGainImage();
 
             var keepWaiting = true;
 
-            internalImageAcquired = () => { Trace.WriteLine("Gain image returned");  keepWaiting = false;  };
+            internalAcqDone = () => { Trace.WriteLine("Gain image returned");  keepWaiting = false; bufferGood = false; };
 
             Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, InternalFrameAcquired, InternalAcqDone);
+            SetImageCount((int)dwFrames);
+
             var resp = Acquisition_Acquire_GainImage(deviceHandle, offsetHandle.AddrOfPinnedObject(), gainHandle.AddrOfPinnedObject(), dwRows, dwColumns, dwFrames);
             Trace.WriteLine("Acquisition_Acquire_GainImage: " + resp);
 
             if (resp == HIS_RETURN.HIS_ALL_OK)
             {
-                for (var i = 0; i < 30; i++)
+                for (var i = 0; i < 100; i++)
                 {
                     if (keepWaiting)
                         Task.WaitAll(Task.Delay(100));
@@ -207,7 +244,8 @@ namespace xraylib
             return gainArr;
         }
 
-        public ushort[] GetOffsetImage()
+
+        private void allocOffsetImage()
         {
             try
             {
@@ -220,20 +258,30 @@ namespace xraylib
                 ex.Trace();
             }
 
+            if(offsetArr != null)
+                offsetHandle = GCHandle.Alloc(offsetArr, GCHandleType.Pinned);
+            else
+            { Trace.WriteLine("WARN: In allocOffsetImage, but offsetArr is null"); }
+        }
+
+        public ushort[] GetOffsetImage()
+        {
             offsetArr = new ushort[this.imageBufferSize];
 
-            offsetHandle = GCHandle.Alloc(offsetArr, GCHandleType.Pinned);
-            
+            allocOffsetImage();
+
             var keepWaiting = true;
-            internalImageAcquired = () => { Trace.WriteLine("Offset image returned");  keepWaiting = false; };
+            internalAcqDone  = () => { Trace.WriteLine("Offset image returned");  keepWaiting = false; bufferGood = false; };
             Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, InternalFrameAcquired, InternalAcqDone);
+
+            SetImageCount((int)dwFrames);
 
             var resp = Acquisition_Acquire_OffsetImage(deviceHandle, offsetHandle.AddrOfPinnedObject(), dwRows, dwColumns, dwFrames);
             Trace.WriteLine("Acquisition_Acquire_OffsetImage: " + resp);
 
             if (resp == HIS_RETURN.HIS_ALL_OK)
             {
-                for (var i = 0; i < 30; i++)
+                for (var i = 0; i < 100; i++)
                 {
                     if (keepWaiting)
                         Task.WaitAll(Task.Delay(100));
@@ -310,6 +358,9 @@ namespace xraylib
 
         private bool CheckBuffer()
         {
+            if (!configGood)
+                GetConfiguration();
+
             if (!bufferGood || imageBuffer.Length != dwFrames * dwRows * dwColumns * 2)
             {
                 Trace.WriteLine("Buffer bad.");
@@ -317,6 +368,28 @@ namespace xraylib
             }
 
             Trace.WriteLine("Buffer good.");
+            return true;
+        }
+
+        private bool CheckOffset()
+        {
+            if (!configGood)
+                GetConfiguration();
+
+            if (offsetArr == null || offsetHandle == null || !offsetHandle.IsAllocated || offsetArr.Length != this.imageBufferSize)
+                return false;
+
+            return true;
+        }
+
+        private bool CheckGain()
+        {
+            if (!configGood)
+                GetConfiguration();
+
+            if (gainArr == null || gainHandle == null || !gainHandle.IsAllocated || gainArr.Length != this.imageBufferSize)
+                return false;
+
             return true;
         }
 
@@ -342,7 +415,7 @@ namespace xraylib
                     ex.Trace();
                 }
                 
-                var buffSize = dwFrames * dwRows * dwColumns * 2;
+                buffSize = (int)(dwFrames * dwRows * dwColumns * 2);
                 
                 imageBuffer = new ushort[buffSize];
 
@@ -361,9 +434,6 @@ namespace xraylib
 
         public HIS_RETURN CreatePixelMap()
         {
-            if (!configGood)
-                GetConfiguration();
-
             if (!CheckBuffer())
             {
                 Trace.WriteLine("Buffer not good and we're in CreatePixelMap, calling SetBuffer");
@@ -385,7 +455,6 @@ namespace xraylib
                 Trace.WriteLine("Second call to Acquisition_CreatePixelMap Device response: " + resp.ToString());
             }
             
-
             return resp;
         }
 
@@ -410,10 +479,21 @@ namespace xraylib
                 }
 
                 Acquisition_SetCallbacksAndMessages(deviceHandle, hwnd, 0, 0, FrameAcquired, AcqDone);
+                
+                HIS_RETURN resp = HIS_RETURN.HIS_ERROR_ACQ;
 
-                corrList = null;
+                ushort[] dummyOffset = null;
+                uint[] dummyGain = null;
 
-                var resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, offsetArr, gainArr, corrList);
+                SetImageCount((int)dwFrames);
+
+                if (!CheckOffset())
+                    resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, dummyOffset, dummyGain, corrList);
+                else if(!CheckGain())
+                    resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, offsetHandle.AddrOfPinnedObject(), dummyGain, corrList);
+                else
+                    resp = Acquisition_Acquire_Image(deviceHandle, dwFrames, 0, HIS_SEQ.AVERAGE, offsetHandle.AddrOfPinnedObject(), gainHandle.AddrOfPinnedObject(), corrList);
+
                 Trace.WriteLine("Acquisition_Acquire_Image Device response: " + resp.ToString());
 
                 return resp;
@@ -467,6 +547,12 @@ namespace xraylib
                 
                 if (bufferHandle != null && bufferHandle.IsAllocated)
                     bufferHandle.Free();
+
+                if (offsetHandle != null && offsetHandle.IsAllocated)
+                    offsetHandle.Free();
+
+                if (gainHandle != null && gainHandle.IsAllocated)
+                    gainHandle.Free();
 
                 disposedValue = true;
             }

@@ -17,6 +17,22 @@
             {
                 components.Dispose();
             }
+
+            try
+            {
+                if (this.motion != null)
+                    this.motion.Dispose();
+            } catch
+            { }
+
+            try
+            {
+                if (this.acquire != null)
+                    this.acquire.Dispose();
+            }
+            catch
+            { }
+
             base.Dispose(disposing);
         }
 
@@ -85,6 +101,7 @@
             this.closeDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new AForge.Controls.PictureBox();
             this.tmrPollAngle = new System.Windows.Forms.Timer(this.components);
+            this.btnApplyWindowLevel = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -678,6 +695,7 @@
             this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel7.Controls.Add(this.btnApplyWindowLevel);
             this.panel7.Controls.Add(this.sLevel);
             this.panel7.Controls.Add(this.sWindow);
             this.panel7.Controls.Add(this.label11);
@@ -770,6 +788,17 @@
             // 
             this.tmrPollAngle.Enabled = true;
             this.tmrPollAngle.Tick += new System.EventHandler(this.tmrPollAngle_Tick);
+            // 
+            // btnApplyWindowLevel
+            // 
+            this.btnApplyWindowLevel.Enabled = false;
+            this.btnApplyWindowLevel.Location = new System.Drawing.Point(834, 10);
+            this.btnApplyWindowLevel.Name = "btnApplyWindowLevel";
+            this.btnApplyWindowLevel.Size = new System.Drawing.Size(75, 23);
+            this.btnApplyWindowLevel.TabIndex = 29;
+            this.btnApplyWindowLevel.Text = "Apply";
+            this.btnApplyWindowLevel.UseVisualStyleBackColor = true;
+            this.btnApplyWindowLevel.Click += new System.EventHandler(this.btnApplyWindowLevel_Click);
             // 
             // Form1
             // 
@@ -876,6 +905,7 @@
         private AForge.Controls.PictureBox pictureBox1;
         private System.Windows.Forms.Timer tmrPollAngle;
         private System.Windows.Forms.Button btnAcquireOnly;
+        private System.Windows.Forms.Button btnApplyWindowLevel;
     }
 }
 

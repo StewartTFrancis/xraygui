@@ -46,6 +46,9 @@ namespace xraygui
 			cbFOV.ValueMember = "Value";
 			cbFOV.SelectedIndex = 0;
 
+			cbMoveType.DataSource = Helpers.movementMap;
+			cbMoveType.DisplayMember = "Display";
+			cbMoveType.ValueMember = "Value";
 			cbMoveType.SelectedIndex = 0;
 
 			cbIntegration.SelectedIndex = 7;
@@ -74,7 +77,7 @@ namespace xraygui
 				// Wrap this all in a task so we can continue, but do the image correct syncronously before calling update/image delegate.
 				Task.Run(() =>
 				{
-					// DoImageRotation(ref imageData);
+					DoImageRotation(ref imageData);
 					this.imageData = imageData;
 
 					byte[] imageBytes = Helpers.getBytesFromUshort(imageData);
@@ -92,9 +95,9 @@ namespace xraygui
 			}
 		}
 
-		private void DoImageRotation(ref uint[] imageData)
+		private void DoImageRotation(ref ushort[] imageData)
 		{
-			var newData = new uint[imageData.Length];
+			var newData = new ushort[imageData.Length];
 
 			int width = (int)acquire.dwColumns;
 			int height = (int)acquire.dwRows;
@@ -102,24 +105,42 @@ namespace xraygui
 			for (var x = 0; x < width; x++)
 				for (var y = 0; y < height; y++)
 				{
-					newData[y + (y * width)] = imageData[x + (y * width)];
-					//newData[y + (x * width + 1)] = imageData[x + (y * width) + 1];
+					// 90 CW
+					// newData[mapXY(x, y, width)] = imageData[mapXY(y, (height - x) - 1, width)];
+
+					// 90 CCW
+					newData[MapXY(x, y, width)] = imageData[MapXY((width - y) - 1, x, width)];
 				}
 
 			imageData = newData;
 		}
 
+		private static int MapXY(int x, int y, int width)
+		{
+			return x + (y * width);
+		}
+
 		private ushort[] ApplyWindowLevel(ushort[] imageData)
 		{
+			var start = DateTime.Now;
+			Trace.WriteLine("Applying windowing/leveling");
 			//((pixelData[i] - (wLevel - wWidth / 2)) *255) * wWidth
-			
-			return imageData.Select((pix)=> {
-				return (ushort)(((pix - sLevel.Value - sWindow.Value / 2) * ushort.MaxValue) * sWindow.Value);
-			}).ToArray();
+
+			ushort level = (ushort)sLevel.Value;
+			ushort window = (ushort)sWindow.Value;
+			ushort maxVal = ushort.MaxValue;
+
+			imageData = Array.ConvertAll(imageData, i => (ushort)(((i - level - window / 2) * maxVal) * window));
+
+			Trace.WriteLine("Done windowing/leveling took: " + (DateTime.Now - start).Milliseconds);
+
+			return imageData;
 		}
 
 		private void UpdateImage(byte[] imageData)
 		{
+			var start = DateTime.Now;
+			Trace.WriteLine("Starting update image");
 			try
 			{
 				using (var image = AForge.Imaging.UnmanagedImage.Create((int)acquire.dwColumns, (int)acquire.dwRows, System.Drawing.Imaging.PixelFormat.Format16bppGrayScale))
@@ -134,12 +155,16 @@ namespace xraygui
 					if (currImage != null)
 						currImage.Dispose();
 				}
+
+				
+
 			} catch (Exception ex)
 			{
 				Trace.WriteLine("Error updating live image.");
 				ex.Trace();
 			}
-			
+
+			Trace.WriteLine("Done update image took: " + (DateTime.Now - start).Milliseconds);
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -207,7 +232,7 @@ namespace xraygui
 			}
 			try
 			{
-				var save = GetFileNameToSave(".tiff");
+				var save = GetFileNameToSave(".tif");
 
 				if (!string.IsNullOrEmpty(save))
 				{
@@ -268,7 +293,13 @@ namespace xraygui
 
 			double currAngle = startAngle;
 
+			bool gotRequestedImage = true;
+			int waitCount = 0;
+
 			imageDelegate = (imageBytes) => {
+				gotRequestedImage = true;
+				Trace.WriteLine("Got image for angle " + currAngle);
+				
 				try
 				{
 					var makeFileName = "IMAGE-{0:N2}.tif";
@@ -278,14 +309,32 @@ namespace xraygui
 				{
 					Trace.WriteLine("Error in save.");
 					ex.Trace();
+				} catch
+				{
+					Trace.WriteLine("Unmanaged Error in save.");
 				}
 			};
 
-			for(currAngle = startAngle; step > 0 ? currAngle <= endAngle : currAngle >= endAngle ; currAngle += step)
+
+
+			for (currAngle = startAngle; step > 0 ? currAngle <= endAngle : currAngle >= endAngle; currAngle += step)
 			{
+				while (!gotRequestedImage && waitCount < 1000)
+				{
+					Thread.Sleep(100);
+					waitCount++;
+				}
+
+				if(!gotRequestedImage)
+					Trace.WriteLine("Didn't get the requested image in time. This might cause issues.");
+
+				Trace.WriteLine("Taking capture for angle: " + currAngle);
 				motion.Move(currAngle, MovementType.Absolute);
 				Thread.Sleep((int)(numSettle.Value * 1000));
+				
+				waitCount = 0;
 				acquire.AcquireImage();
+				gotRequestedImage = false;
 			}
 		}
 
@@ -338,14 +387,14 @@ namespace xraygui
 			btnHome.Enabled = acquire.state == AcqController.State.OPEN;
 			btnMove.Enabled = acquire.state == AcqController.State.OPEN;
 			btnAcquireOnly.Enabled = acquire.state == AcqController.State.OPEN;
+			btnApplyWindowLevel.Enabled = acquire.state == AcqController.State.OPEN;
 
 			openDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.CLOSED;
 			closeDeviceToolStripMenuItem.Visible = acquire.state == AcqController.State.OPEN;
-		}
 
-		private void testToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-		
+			cbOffset.Enabled = acquire.state == AcqController.State.OPEN;
+			cbGain.Enabled = acquire.state == AcqController.State.OPEN;
+			cbPixelCorr.Enabled = acquire.state == AcqController.State.OPEN;
 		}
 
 		private void cbIntegration_SelectedIndexChanged(object sender, EventArgs e)
@@ -353,11 +402,11 @@ namespace xraygui
 			acquire.SetCameraMode((uint)((ComboBox)sender).SelectedIndex);
 		}
 
-		private string GetFileNameToLoad(string ext)
+		private static string GetFileNameToLoad(string ext)
 		{
 			using(OpenFileDialog ofd = new OpenFileDialog())
 			{
-				ofd.Filter = string.Format("*.{0}|{0}", ext);
+				ofd.Filter = string.Format("{0}|*.{0}", ext);
 				ofd.DefaultExt = ext;
 
 				if (ofd.ShowDialog() == DialogResult.OK)
@@ -367,11 +416,12 @@ namespace xraygui
 			return null;
 		}
 
-		private string GetFileNameToSave(string ext)
+		private static string GetFileNameToSave(string ext)
 		{
 			using (SaveFileDialog sfd = new SaveFileDialog())
 			{
-				sfd.Filter = string.Format("*.{0}|{0}", ext);
+				sfd.Filter = string.Format("{0}|*.{0}", ext);
+				sfd.DefaultExt = ext;
 
 				if (sfd.ShowDialog() == DialogResult.OK)
 					return sfd.FileName;
@@ -410,9 +460,6 @@ namespace xraygui
 				}
 			throw new Exception("Failed to load.");
 		}
-
-		
-
 		private void cbOffset_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			var cbSender = ((ComboBox)sender);
@@ -421,7 +468,7 @@ namespace xraygui
 			switch(index)
 			{
 				case 0: // None
-					acquire.offsetArr = null;
+					acquire.SetOffsetArr(null);
 					break;
 				case 1: // Acquire New
 					var offset = acquire.GetOffsetImage();
@@ -452,17 +499,18 @@ namespace xraygui
 							MessageBox.Show("Loaded data wasn't saved for the current width/height, this might cause failures.");
 						}
 
-						acquire.offsetArr = (ushort[])loaded.data;
+						acquire.SetOffsetArr((ushort[])loaded.data);
 
 					} catch (Exception ex)
 					{
+						Trace.WriteLine("Error on load Offset.");
+						ex.Trace();
 						cbSender.SelectedIndex = 0; // Back to None for you.
 						//We already showed a msgbox here.
 					}
 					break;
 			}
 		}
-
 		private void cbGainImage_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			var cbSender = ((ComboBox)sender);
@@ -471,7 +519,7 @@ namespace xraygui
 			switch (index)
 			{
 				case 0: // None
-					acquire.gainArr = null;
+					acquire.SetGainArr(null);
 					break;
 				case 1: // Acquire New
 					var gain = acquire.GetGainImage();
@@ -503,11 +551,13 @@ namespace xraygui
 							MessageBox.Show("Loaded data wasn't saved for the current width/height, this might cause failures.");
 						}
 
-						acquire.gainArr = (uint[])loaded.data;
+						acquire.SetGainArr((uint[])loaded.data);
 
 					}
 					catch (Exception ex)
 					{
+						Trace.WriteLine("Error on load Gain.");
+						ex.Trace();
 						cbSender.SelectedIndex = 0; // Back to None for you.
 													//We already showed a msgbox here.
 					}
@@ -560,6 +610,8 @@ namespace xraygui
 					}
 					catch (Exception ex)
 					{
+						Trace.WriteLine("Error on load Correction.");
+						ex.Trace();
 						cbSender.SelectedIndex = 0; // Back to None for you.
 													//We already showed a msgbox here.
 					}
@@ -604,19 +656,20 @@ namespace xraygui
 			}
 		}
 
-		private void testToolStripMenuItem_Click_1(object sender, EventArgs e)
-		{
-			acquire.GetOffsetImage();
-		}
-
-
-
 		private void windowLevelChange(object sender, EventArgs e)
 		{
 			//Debounce call so we don't flood w/ requests.
-			debounceWindowLevel.Debounce(2000, (obj) => {
-				UpdateImage(Helpers.getBytesFromUshort(ApplyWindowLevel(this.imageData))); 
-			});
+			/*debounceWindowLevel.Debounce(2000, (obj) => {
+							});*/
+		}
+
+		private void btnApplyWindowLevel_Click(object sender, EventArgs e)
+		{
+			if(this.imageData != null)
+			{
+				UpdateImage(Helpers.getBytesFromUshort(ApplyWindowLevel(this.imageData)));
+			}
+				
 		}
 	}
 }

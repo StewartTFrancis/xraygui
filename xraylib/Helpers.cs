@@ -56,7 +56,12 @@ namespace xraylib
 
         public static byte[] getBytesFromUshort(ushort[] data)
         {
-            return data.SelectMany((val) => BitConverter.GetBytes(val)).ToArray();
+            var start = DateTime.Now;
+
+            System.Diagnostics.Trace.WriteLine("Starting convert ushort to bytes");
+            var bytes = data.SelectMany((val) => BitConverter.GetBytes(val)).ToArray();
+            System.Diagnostics.Trace.WriteLine("Done convert ushort to bytes took: " + (DateTime.Now - start).Milliseconds);
+            return bytes;
         }
 
     }

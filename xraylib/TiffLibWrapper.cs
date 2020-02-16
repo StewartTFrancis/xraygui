@@ -22,7 +22,7 @@ namespace xraylib
                     tiff.SetField(TiffTag.COMPRESSION, Compression.NONE);
                     tiff.SetField(TiffTag.FILLORDER, FillOrder.MSB2LSB);
 
-                    Trace.WriteLine("Writing tiff");
+                    Trace.WriteLine("Writing tiff: " + filename + ", imgBytes.length " + bytes.Length);
                     for (var i = 0; i < height; i++)
                     {
                         tiff.WriteScanline(bytes, (i * width) * 2, 0, 0);
@@ -34,6 +34,9 @@ namespace xraylib
             {
                 Trace.WriteLine("Error in saving tiff");
                 ex.Trace();
+            } catch
+            {
+                Trace.WriteLine("Unmanaged Error in saving tiff");
             }
             return false;
         }

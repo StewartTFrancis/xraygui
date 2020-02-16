@@ -888,6 +888,14 @@ namespace xraylib
                       [MarshalAs(UnmanagedType.FunctionPtr)]EndAcqCallback lpfnEndAcqCallback
                       );
 
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern HIS_RETURN Acquisition_SetCallbacksAndMessages(IntPtr pAcqDesc,
+              HandleRef hWnd,
+              uint dwErrorMsg, uint dwLoosingFramesMsg,
+              [MarshalAs(UnmanagedType.FunctionPtr)]IntPtr lpfnEndFrameCallback,
+              [MarshalAs(UnmanagedType.FunctionPtr)]IntPtr lpfnEndAcqCallback
+              );
+
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_EnumSensors(ref uint pdwNumSensors, bool bEnableIRQ, bool bAlwaysOpen);
 
@@ -903,6 +911,12 @@ namespace xraylib
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, [In] ushort[] pwOffsetData, [In] uint[] pdwGainData, [In] int[] pdwPxlCorrList);
+
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt, IntPtr pwOffsetData, IntPtr pdwGainData, [In] int[] pdwPxlCorrList);
+
+        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+        public static extern HIS_RETURN Acquisition_Acquire_Image(IntPtr pAcqDesc, uint dwFrames, uint dwSkipFrms, HIS_SEQ dwOpt,IntPtr pwOffsetData, [In] uint[] pdwGainData, [In] int[] pdwPxlCorrList);
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_Acquire_Image_Ex(IntPtr hAcqDesc, uint dwFrames, uint dwSkipFrms, uint dwOpt,
@@ -932,14 +946,15 @@ namespace xraylib
 
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_CreateGainMap(ref ushort pGainData, ref ushort pGainAVG, int nCount, int nFrame);
+        
         [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         public static extern HIS_RETURN Acquisition_CreatePixelMap([In] ushort[] pData, uint nDataRows, uint nDataColumns, [In, Out] int[] pCorrList, ref uint nCorrListSize);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoOffsetCorrection(ushort* pSource, ushort* pDest, ushort* pOffsetData, int nCount);
 
-        //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
-        //        public static extern HIS_RETURN Acquisition_DoOffsetGainCorrection(ushort* pSource, ushort* pDest, ushort* pOffsetData, uint* pGainData, int nCount);
+                [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
+                public static extern HIS_RETURN Acquisition_DoOffsetGainCorrection(IntPtr pSource, IntPtr pDest, IntPtr pOffsetData, IntPtr pGainData, int nCount);
 
         //        [DllImport("XISL.dll", CharSet = CharSet.Ansi)]
         //        public static extern HIS_RETURN Acquisition_DoOffsetGainCorrection_Ex(ushort* pSource, ushort* pDest, ushort* pOffsetData, ushort* pGainData,
