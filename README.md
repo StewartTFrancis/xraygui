@@ -1,2 +1,2 @@
 # xraygui
-Custom GUI for Complex Data Solutions
+Custom GUI for XISL dll interface
