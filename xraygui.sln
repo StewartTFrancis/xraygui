@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xraygui", "xraygui\xraygui.csproj", "{FA95CCBE-CC12-406F-8291-5A5B9A196D54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xraylib", "xraylib\xraylib.csproj", "{F40EC614-4C54-435D-94A6-512DB35A3CF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A06571AC-831F-4E92-A050-D12DD8711E1D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA95CCBE-CC12-406F-8291-5A5B9A196D54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA95CCBE-CC12-406F-8291-5A5B9A196D54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA95CCBE-CC12-406F-8291-5A5B9A196D54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA95CCBE-CC12-406F-8291-5A5B9A196D54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F40EC614-4C54-435D-94A6-512DB35A3CF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F40EC614-4C54-435D-94A6-512DB35A3CF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F40EC614-4C54-435D-94A6-512DB35A3CF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F40EC614-4C54-435D-94A6-512DB35A3CF7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2F85052A-0CF6-43B2-BD7B-F267E4C10A36}
+	EndGlobalSection
+EndGlobal
